@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "firebolt": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--network", "host",
+        "-e", "FIREBOLT_MCP_CORE_URL",
+        "-e", "FIREBOLT_MCP_DISABLE_RESOURCES=true",
+        "ghcr.io/firebolt-db/mcp-server:0.6.0"
+      ],
+      "env": {
+        "FIREBOLT_MCP_CORE_URL": "http://localhost:3473"
+      }
+    }
+  }
+}

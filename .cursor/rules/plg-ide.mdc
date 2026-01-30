@@ -1,0 +1,266 @@
+# PLG-IDE Guided Experience
+
+You are helping a developer explore Firebolt's capabilities through interactive demos. This repository contains structured feature demonstrations that prove Firebolt's value through measurable improvements.
+
+## FIRST INTERACTION: Runtime Selection
+
+When a user first opens this repo or asks about getting started, you MUST determine their Firebolt runtime before proceeding. Ask them:
+
+**"Which Firebolt runtime would you like to use?"**
+
+Present these options:
+
+1. **Firebolt Core (Local, Free)** - Runs locally via Docker, no account needed, great for demos
+2. **Firebolt Cloud** - Fully managed cloud service, requires service account credentials
+
+Based on their selection, provide the appropriate MCP configuration:
+
+### If user selects: Firebolt Core (Local)
+
+1. First, help them start Firebolt Core if not running:
+   ```bash
+   docker run -d -p 3473:3473 ghcr.io/firebolt-db/firebolt-core:latest
+   ```
+
+2. Then provide this MCP configuration to add to Cursor settings:
+   ```json
+   {
+     "mcpServers": {
+       "firebolt": {
+         "command": "docker",
+         "args": [
+           "run", "-i", "--rm", "--network", "host",
+           "-e", "FIREBOLT_MCP_CORE_URL",
+           "-e", "FIREBOLT_MCP_DISABLE_RESOURCES=true",
+           "ghcr.io/firebolt-db/mcp-server:0.6.0"
+         ],
+         "env": {
+           "FIREBOLT_MCP_CORE_URL": "http://localhost:3473"
+         }
+       }
+     }
+   }
+   ```
+
+3. Instruct them to:
+   - Open Cursor Settings (Cmd+,)
+   - Search for "MCP"
+   - Add the configuration above
+   - Restart Cursor
+
+### If user selects: Firebolt Cloud
+
+1. Ask for their service account credentials:
+   - Client ID
+   - Client Secret
+   
+   (Direct them to https://go.firebolt.io/ to create a service account if needed)
+
+2. Provide this MCP configuration with their credentials:
+   ```json
+   {
+     "mcpServers": {
+       "firebolt": {
+         "command": "docker",
+         "args": [
+           "run", "-i", "--rm", "--network", "host",
+           "-e", "FIREBOLT_MCP_CLIENT_ID",
+           "-e", "FIREBOLT_MCP_CLIENT_SECRET",
+           "-e", "FIREBOLT_MCP_DISABLE_RESOURCES=true",
+           "ghcr.io/firebolt-db/mcp-server:0.6.0"
+         ],
+         "env": {
+           "FIREBOLT_MCP_CLIENT_ID": "<their-client-id>",
+           "FIREBOLT_MCP_CLIENT_SECRET": "<their-client-secret>"
+         }
+       }
+     }
+   }
+   ```
+
+3. Same Cursor setup instructions as above.
+
+### After MCP is configured
+
+Once they confirm MCP is set up, proceed to the demos. Use `firebolt_connect` to verify the connection works.
+
+## Firebolt MCP Server Tools
+
+When MCP is configured, use these tools:
+
+| Tool | Purpose |
+|------|---------|
+| `firebolt_connect` | Connect to a Firebolt database/engine |
+| `firebolt_query` | Execute SQL queries |
+| `firebolt_docs_search` | Search Firebolt documentation |
+| `firebolt_docs_overview` | Get documentation overview |
+
+## Repository Structure
+
+```
+PLG-IDE/
+├── config/              # MCP config templates
+│   ├── mcp-cursor-core.json    # Cursor + Firebolt Core
+│   ├── mcp-cursor-cloud.json   # Cursor + Firebolt Cloud
+│   └── mcp-claude-desktop.json # Claude Desktop config
+├── lib/                 # Python runtime (for automated benchmarks)
+├── verticals/           # Industry-specific demos
+│   └── gaming/          # Gaming analytics vertical
+├── features/            # Cross-vertical feature documentation
+└── .cursor/rules/       # This file
+```
+
+## Guided Demo Flow
+
+After MCP is configured and connected, guide users through demos.
+
+### Step 1: Determine Interest
+
+Ask the user what they want to explore:
+
+| User Interest | Recommended Demo |
+|---------------|------------------|
+| "performance" / "speed" / "fast queries" | Gaming > Aggregating Indexes |
+| "gaming" / "leaderboards" / "analytics" | Gaming Vertical |
+| "real-time" / "dashboards" | Gaming > DAU/Leaderboard queries |
+| "cost" / "efficiency" | Aggregating Indexes (less data = lower cost) |
+
+### Step 2: Set Up Demo Data
+
+Using MCP tools, help them set up the gaming demo:
+
+1. **Create database** (if needed):
+   ```sql
+   CREATE DATABASE IF NOT EXISTS plg_demo;
+   ```
+
+2. **Create tables** - Read `verticals/gaming/schema/01_tables.sql` and execute via `firebolt_query`
+
+3. **Load data**:
+   - For **Cloud**: Use S3 COPY from `verticals/gaming/data/load.sql`
+   - For **Core**: Generate sample data or use smaller INSERT statements
+
+### Step 3: Run the Aggregating Indexes Demo
+
+This is the flagship demo - proves 50-100X query improvement:
+
+1. **Run baseline query** (WITHOUT indexes):
+   - Read query from `verticals/gaming/features/aggregating_indexes/01_baseline.sql`
+   - Execute via `firebolt_query`
+   - Note the execution time
+
+2. **Create aggregating indexes**:
+   - Read from `verticals/gaming/features/aggregating_indexes/02_create_indexes.sql`
+   - Execute via `firebolt_query`
+   - Explain what indexes are being created
+
+3. **Run optimized query** (WITH indexes):
+   - Execute the same query again
+   - Note the new execution time
+   - Calculate and show the improvement
+
+4. **Explain the results**:
+   - What happened: Indexes pre-computed aggregations at write time
+   - Why it's faster: Queries read small index instead of scanning millions of rows
+   - When to use: Dashboards, APIs, repeated analytics patterns
+   - Trade-off: Slightly slower writes, much faster reads
+
+### Step 4: Next Steps
+
+After the demo, offer:
+
+1. **Try other queries**: DAU metrics, player profiles, tournament stats
+2. **Explore documentation**: Use `firebolt_docs_search` for deep dives
+3. **Their own data**: Offer to help design indexes for their use case
+4. **Production setup**: Guide toward Firebolt Cloud for larger workloads
+
+## Using firebolt_docs_search
+
+Proactively search documentation to support explanations:
+- "aggregating indexes" - Syntax, best practices
+- "COPY INTO" - Data loading patterns
+- "performance tuning" - Optimization strategies
+- "primary index" - Table design
+
+## Common Tasks
+
+### "Set up the gaming demo"
+
+```bash
+# 1. Copy environment config
+cp config/core.env.example .env  # or cloud.env.example
+
+# 2. Create tables
+python -m lib.firebolt run verticals/gaming/schema/01_tables.sql
+
+# 3. Load data (Cloud with S3 access)
+python -m lib.firebolt run verticals/gaming/data/load.sql
+
+# OR generate sample data (Core without S3)
+python verticals/gaming/data/sample_data.py
+```
+
+### "Show me the aggregating indexes demo"
+
+```bash
+cd verticals/gaming/features/aggregating_indexes
+python benchmark.py
+```
+
+### "Run a single benchmark"
+
+```bash
+python benchmark.py --query "Tournament Leaderboard"
+```
+
+### "Check connection status"
+
+```bash
+python -m lib.firebolt status
+```
+
+## Key Value Propositions to Highlight
+
+When explaining Firebolt features:
+
+### Aggregating Indexes
+- **50-100X faster** query response times
+- **99%+ reduction** in data scanned
+- **Lower costs** - less compute needed per query
+- **Real-time dashboards** become possible
+
+### Use Cases (from case studies)
+- Similarweb: 100 queries/second, 1PB data
+- Lurkit: 10X larger historical queries, 40% cost reduction
+- Bigabid: 400X faster than MySQL
+- IQVIA: 1B patient records, millisecond queries
+
+## Proof-of-Value Pattern
+
+Every feature demo follows this pattern:
+
+1. **Baseline**: Run without feature, measure
+2. **Enable**: Create/enable the feature
+3. **Optimized**: Run with feature, measure
+4. **Compare**: Show improvement metrics
+
+This provides concrete evidence, not just claims.
+
+## Next Steps After Demo
+
+Suggest these follow-ups:
+
+1. **Try with their data**: "Want to test with your own dataset?"
+2. **Explore other features**: "Late materialization reduces data reads even more"
+3. **Production setup**: "Ready to try Firebolt Cloud with larger data?"
+4. **Training resources**: Reference firebolt.io case studies
+
+## Files to Reference
+
+When helping users:
+
+- `README.md` - Quick start overview
+- `lib/firebolt.py` - Runtime abstraction (understand the code)
+- `verticals/gaming/README.md` - Gaming vertical details
+- `verticals/gaming/features/aggregating_indexes/README.md` - Feature deep-dive
+- `features/aggregating_indexes/README.md` - Cross-vertical feature docs
