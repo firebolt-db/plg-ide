@@ -384,6 +384,71 @@ For each comparison demo:
 
 ---
 
+## Loveable App Development
+
+The Loveable app provides a web-based UI for users not using an IDE directly. Built from this repo's documentation.
+
+### Loveable Specification Files
+
+| File | Purpose |
+|------|---------|
+| `KNOWLEDGE.md` | Primary AI context - product vision, design system, features |
+| `docs/APP_SPEC.md` | Page structure, layouts, component specifications |
+| `docs/DATA_CONTRACTS.md` | TypeScript interfaces for all data shapes |
+| `docs/USER_FLOWS.md` | Step-by-step user journeys |
+
+### Loveable Build Phases
+
+#### Phase L1: Core Demo Runner
+- [ ] Home page with runtime selection (Core vs Cloud)
+- [ ] Connection setup wizard
+- [ ] Vertical selection grid (Gaming first)
+- [ ] Feature selection within vertical
+- [ ] Before/After benchmark comparison view
+- [ ] Metric display cards with improvement percentages
+
+**Design System**: Use Firebolt brand colors (#F72A30 primary), Poppins headings, Inter body text
+
+#### Phase L2: SQL Playground
+- [ ] SQL editor with syntax highlighting (Monaco/CodeMirror)
+- [ ] Dark theme code blocks (#1A0404 background, Roboto Mono)
+- [ ] Query results table with pagination
+- [ ] Execution metrics display
+- [ ] Schema browser sidebar
+- [ ] Query history (local storage)
+
+#### Phase L3: Sales Training Mode
+- [ ] Training module structure
+- [ ] Progress tracking per user
+- [ ] Quiz/verification at end of modules
+- [ ] Talking points for each demo
+- [ ] Exportable demo results (PDF/markdown)
+
+#### Phase L4: Competitive Benchmarks
+- [ ] Side-by-side comparison UI (Firebolt vs ClickHouse)
+- [ ] Benchmark methodology display
+- [ ] "Run it yourself" instructions
+- [ ] Share/export results
+- [ ] Key differentiator highlights
+
+#### Phase L5: Partner Portal
+- [ ] Multi-user authentication
+- [ ] Team progress dashboards
+- [ ] Certification path
+- [ ] Custom branding for partners
+
+### Loveable Starter Prompts
+
+Use these prompts to build incrementally:
+
+1. "Create a home page with runtime selection using Firebolt brand colors from KNOWLEDGE.md"
+2. "Build a vertical selection grid with cards for Gaming, showing dataset info"
+3. "Create a benchmark comparison page with before/after metric cards"
+4. "Add a SQL editor with dark theme and Roboto Mono font"
+5. "Build a connection wizard with step indicators"
+
+---
+
 ## Adding a New Vertical
 
 1. Create `verticals/{name}/README.md` with use case overview
