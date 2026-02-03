@@ -197,22 +197,30 @@ fi
 
 # --- Firebolt Cloud Setup ---
 if [ "$RUNTIME" = "cloud" ]; then
-    echo -e "  ${YELLOW}Firebolt Cloud requires service account credentials.${NC}"
+    echo -e "  ${YELLOW}Firebolt Cloud Setup${NC}"
     echo ""
     echo -e "  ${CYAN}┌─────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "  ${CYAN}│ ${BOLD}How to get your credentials:${NC}${CYAN}                                   │${NC}"
+    echo -e "  ${CYAN}│ ${BOLD}NEW ACCOUNT SETUP (if you haven't done this yet):${NC}${CYAN}              │${NC}"
     echo -e "  ${CYAN}│                                                                 │${NC}"
-    echo -e "  ${CYAN}│  1. Log in to ${BOLD}https://go.firebolt.io/${NC}${CYAN}                         │${NC}"
-    echo -e "  ${CYAN}│  2. Click your profile → ${BOLD}Govern${NC}${CYAN} → ${BOLD}Service accounts${NC}${CYAN}           │${NC}"
-    echo -e "  ${CYAN}│  3. Create a new service account (or use existing)             │${NC}"
-    echo -e "  ${CYAN}│  4. Copy the ${BOLD}Client ID${NC}${CYAN} and ${BOLD}Client Secret${NC}${CYAN}                     │${NC}"
+    echo -e "  ${CYAN}│  ${BOLD}Step 1: Create an Engine${NC}${CYAN} (compute resource)                   │${NC}"
+    echo -e "  ${CYAN}│    → Log in to ${BOLD}https://go.firebolt.io/${NC}${CYAN}                        │${NC}"
+    echo -e "  ${CYAN}│    → Click ${BOLD}Engines${NC}${CYAN} → ${BOLD}Create Engine${NC}${CYAN}                          │${NC}"
+    echo -e "  ${CYAN}│    → Name: 'demo_engine', Size: 'S' → ${BOLD}Create & Start${NC}${CYAN}          │${NC}"
+    echo -e "  ${CYAN}│                                                                 │${NC}"
+    echo -e "  ${CYAN}│  ${BOLD}Step 2: Create a Database${NC}${CYAN}                                      │${NC}"
+    echo -e "  ${CYAN}│    → Click ${BOLD}Databases${NC}${CYAN} → ${BOLD}Create Database${NC}${CYAN}                       │${NC}"
+    echo -e "  ${CYAN}│    → Name: 'ultrafast' → ${BOLD}Create${NC}${CYAN}                               │${NC}"
+    echo -e "  ${CYAN}│                                                                 │${NC}"
+    echo -e "  ${CYAN}│  ${BOLD}Step 3: Get Service Account Credentials${NC}${CYAN}                       │${NC}"
+    echo -e "  ${CYAN}│    → Click your profile → ${BOLD}Govern${NC}${CYAN} → ${BOLD}Service accounts${NC}${CYAN}         │${NC}"
+    echo -e "  ${CYAN}│    → Create new account → Copy ${BOLD}Client ID${NC}${CYAN} & ${BOLD}Secret${NC}${CYAN}           │${NC}"
     echo -e "  ${CYAN}│                                                                 │${NC}"
     echo -e "  ${CYAN}│  ${BOLD}Docs:${NC}${CYAN} https://docs.firebolt.io/godocs/Guides/managing-your-  │${NC}"
     echo -e "  ${CYAN}│        organization/service-accounts.html                       │${NC}"
     echo -e "  ${CYAN}└─────────────────────────────────────────────────────────────────┘${NC}"
     echo ""
-    echo -e "  ${BOLD}[A]${NC} Enter credentials now"
-    echo -e "  ${BOLD}[B]${NC} Skip for now (configure .env manually later)"
+    echo -e "  ${BOLD}[A]${NC} Enter credentials now (I have engine + database ready)"
+    echo -e "  ${BOLD}[B]${NC} Skip for now (I need to set up my account first)"
     echo ""
     echo -e "  ${CYAN}Type ${BOLD}A${NC}${CYAN} or ${BOLD}B${NC}${CYAN} and press Enter${NC}"
     echo ""
@@ -226,28 +234,44 @@ if [ "$RUNTIME" = "cloud" ]; then
             echo -e "  ${CYAN}Enter your Client Secret and press Enter (input hidden):${NC}"
             read -s -p "  Client Secret: " CLIENT_SECRET
             echo ""
-            echo -e "  ${CYAN}Enter your Account Name and press Enter:${NC}"
+            echo -e "  ${CYAN}Enter your Account Name (e.g., 'my-company') and press Enter:${NC}"
             read -p "  Account Name: " ACCOUNT_NAME
+            echo -e "  ${CYAN}Enter your Engine Name (e.g., 'demo_engine') and press Enter:${NC}"
+            read -p "  Engine Name: " ENGINE_NAME
             
             if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
                 echo -e "  ${RED}✗ Client ID and Secret are required${NC}"
                 PREREQ_PASSED=false
             else
                 # Save to .env file
-                echo "FIREBOLT_CLIENT_ID=$CLIENT_ID" > .env
+                echo "# Firebolt Cloud Configuration" > .env
+                echo "FIREBOLT_CLIENT_ID=$CLIENT_ID" >> .env
                 echo "FIREBOLT_CLIENT_SECRET=$CLIENT_SECRET" >> .env
                 [ -n "$ACCOUNT_NAME" ] && echo "FIREBOLT_ACCOUNT=$ACCOUNT_NAME" >> .env
-                echo -e "  ${GREEN}✓ Credentials saved to .env${NC}"
+                [ -n "$ENGINE_NAME" ] && echo "FIREBOLT_ENGINE=$ENGINE_NAME" >> .env
+                echo "FIREBOLT_DATABASE=ultrafast" >> .env
+                echo -e "  ${GREEN}✓ Configuration saved to .env${NC}"
+                echo ""
+                echo -e "  ${CYAN}Your .env file:${NC}"
+                echo -e "    FIREBOLT_CLIENT_ID=${CLIENT_ID:0:10}..."
+                echo -e "    FIREBOLT_ACCOUNT=$ACCOUNT_NAME"
+                echo -e "    FIREBOLT_ENGINE=$ENGINE_NAME"
+                echo -e "    FIREBOLT_DATABASE=ultrafast"
             fi
             ;;
         [Bb])
             echo ""
-            echo -e "  ${YELLOW}Skipped credential entry.${NC}"
-            echo -e "  ${CYAN}To configure later, create a ${BOLD}.env${NC}${CYAN} file with:${NC}"
+            echo -e "  ${YELLOW}Skipped - complete the setup steps above first.${NC}"
             echo ""
-            echo -e "    ${BOLD}FIREBOLT_CLIENT_ID${NC}=your-client-id"
-            echo -e "    ${BOLD}FIREBOLT_CLIENT_SECRET${NC}=your-client-secret"
-            echo -e "    ${BOLD}FIREBOLT_ACCOUNT${NC}=your-account-name"
+            echo -e "  ${CYAN}Once you have engine + database + credentials, either:${NC}"
+            echo -e "    1. Re-run this script and select option A"
+            echo -e "    2. Manually create a ${BOLD}.env${NC} file with:"
+            echo ""
+            echo -e "       ${BOLD}FIREBOLT_CLIENT_ID${NC}=your-client-id"
+            echo -e "       ${BOLD}FIREBOLT_CLIENT_SECRET${NC}=your-client-secret"
+            echo -e "       ${BOLD}FIREBOLT_ACCOUNT${NC}=your-account-name"
+            echo -e "       ${BOLD}FIREBOLT_ENGINE${NC}=your-engine-name"
+            echo -e "       ${BOLD}FIREBOLT_DATABASE${NC}=ultrafast"
             echo ""
             PREREQ_PASSED=false
             ;;

@@ -6,9 +6,33 @@
 -- walkthrough of the Ultra Fast Gaming dataset. Run each stage sequentially
 -- to experience the dramatic performance improvements from aggregating indexes.
 --
--- TARGET DATABASE: UltraFast
+-- TARGET DATABASE: ultrafast
 -- EXPECTED DURATION: ~10-15 minutes
 -- 
+-- =============================================================================
+--
+-- ┌─────────────────────────────────────────────────────────────────────────────┐
+-- │                         PREREQUISITES BY RUNTIME                            │
+-- ├─────────────────────────────────────────────────────────────────────────────┤
+-- │                                                                             │
+-- │  FIREBOLT CORE (Local Docker):                                              │
+-- │    ✓ Docker running with Firebolt Core container                           │
+-- │    ✓ No account or credentials needed                                      │
+-- │    ✓ Connect to: http://localhost:3473                                     │
+-- │                                                                             │
+-- │  FIREBOLT CLOUD (New Account):                                              │
+-- │    1. Sign up at https://go.firebolt.io/ (free trial available)            │
+-- │    2. Create an ENGINE (start with 'S' size for demos)                     │
+-- │       → In UI: Engines → Create Engine → Name it → Start it                │
+-- │    3. Create a DATABASE called 'ultrafast'                                 │
+-- │       → In UI: Databases → Create Database → Name: ultrafast               │
+-- │    4. Connect your SQL client to the engine                                │
+-- │       → Use service account credentials (Govern → Service Accounts)        │
+-- │                                                                             │
+-- │  NOTE: The demo generates its own sample data - no external data needed!   │
+-- │                                                                             │
+-- └─────────────────────────────────────────────────────────────────────────────┘
+--
 -- =============================================================================
 --
 -- ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -55,17 +79,27 @@
 -- ╚═══════════════════════════════════════════════════════════════════════════╝
 -- Purpose: Verify connection and prepare the database
 -- Run this first to ensure your environment is ready
+--
+-- ┌─────────────────────────────────────────────────────────────────────────────┐
+-- │  FIREBOLT CLOUD USERS: Before running this stage:                          │
+-- │                                                                             │
+-- │  1. Ensure you have an ENGINE running (Engines → Start)                    │
+-- │  2. If CREATE DATABASE fails, create 'ultrafast' database via the UI:      │
+-- │     → Databases → Create Database → Name: ultrafast → Create               │
+-- │  3. Then connect your SQL client to the 'ultrafast' database               │
+-- │                                                                             │
+-- │  FIREBOLT CORE USERS: Just run the commands below - everything works!      │
+-- └─────────────────────────────────────────────────────────────────────────────┘
 
--- Check Firebolt version
+-- Check Firebolt version (verifies your connection is working)
 SELECT version() AS firebolt_version;
 
--- Create database (if it doesn't exist)
--- Note: In Firebolt Core, databases are created automatically
--- In Firebolt Cloud, you may need to create via UI or API first
-CREATE DATABASE IF NOT EXISTS UltraFast;
+-- Create database (works on Core; Cloud may require UI creation first)
+CREATE DATABASE IF NOT EXISTS ultrafast;
 
 -- Use the database
-USE DATABASE UltraFast;
+-- NOTE: In some SQL clients, you may need to reconnect with database=ultrafast
+USE DATABASE ultrafast;
 
 -- Verify connection
 SELECT 
@@ -145,36 +179,26 @@ SHOW TABLES;
 -- ║                         STAGE 2: DATA LOADING                             ║
 -- ╚═══════════════════════════════════════════════════════════════════════════╝
 -- Purpose: Load the Ultra Fast Gaming dataset
--- Choose Option A (Cloud/S3) or Option B (Core/Sample) based on your environment
+-- 
+-- ┌─────────────────────────────────────────────────────────────────────────────┐
+-- │  IMPORTANT: This demo uses generate_series() to create sample data.        │
+-- │                                                                             │
+-- │  WHY? This approach works identically on:                                   │
+-- │    ✓ Firebolt Core (local Docker)                                          │
+-- │    ✓ Firebolt Cloud (brand new account with no S3 setup)                   │
+-- │                                                                             │
+-- │  The demo creates 500K events - enough to show meaningful performance      │
+-- │  differences without requiring external data sources.                       │
+-- │                                                                             │
+-- │  For LARGER datasets (millions/billions of rows), see OPTION B below       │
+-- │  which loads from Firebolt's public S3 sample datasets.                    │
+-- └─────────────────────────────────────────────────────────────────────────────┘
 
 -- =============================================================================
--- OPTION A: Load from Firebolt's public S3 bucket (Firebolt Cloud)
+-- OPTION A: Generate sample data via SQL (DEFAULT - works everywhere)
 -- =============================================================================
--- Uncomment and run these if you have S3 access configured
-
-/*
-COPY INTO players FROM 
-    's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/players/'
-    WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
-
-COPY INTO games FROM 
-    's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/games/'
-    WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
-
-COPY INTO tournaments FROM 
-    's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/tournaments/'
-    WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
-
-COPY INTO playstats FROM 
-    's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/playstats/'
-    WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
-*/
-
--- =============================================================================
--- OPTION B: Insert sample data (Firebolt Core / Local testing)
--- =============================================================================
--- This creates a smaller dataset for demo purposes
--- Run this if you don't have S3 access or want faster setup
+-- Creates: 10K players, 100 games, 500 tournaments, 500K play events
+-- Approximate load time: 5-30 seconds depending on engine size
 
 -- Insert sample players
 INSERT INTO players (player_id, username, email, registration_date, subscription_type, country, platform)
@@ -235,6 +259,37 @@ UNION ALL SELECT 'games', COUNT(*) FROM games
 UNION ALL SELECT 'tournaments', COUNT(*) FROM tournaments
 UNION ALL SELECT 'playstats', COUNT(*) FROM playstats
 ORDER BY table_name;
+
+-- =============================================================================
+-- OPTION B: Load from S3 (ADVANCED - for larger datasets)
+-- =============================================================================
+-- If you want BILLION-row scale testing, use Firebolt's public sample datasets.
+-- 
+-- PREREQUISITES:
+--   1. You must be on Firebolt Cloud (not Core)
+--   2. Your engine must have access to AWS S3 us-east-1 region
+--   3. First TRUNCATE the tables created above, then run these COPY commands:
+--
+-- TRUNCATE TABLE players;
+-- TRUNCATE TABLE games;  
+-- TRUNCATE TABLE tournaments;
+-- TRUNCATE TABLE playstats;
+--
+-- COPY INTO players FROM 's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/players/'
+--     WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
+--
+-- COPY INTO games FROM 's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/games/'
+--     WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
+--
+-- COPY INTO tournaments FROM 's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/tournaments/'
+--     WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
+--
+-- COPY INTO playstats FROM 's3://firebolt-sample-datasets-public-us-east-1/gaming/parquet/playstats/'
+--     WITH PATTERN = '*.snappy.parquet' TYPE = PARQUET;
+--
+-- NOTE: The S3 dataset contains ~1 billion rows in playstats. Load time depends 
+-- on your engine size. Expect 5-15 minutes for a small engine.
+-- =============================================================================
 
 
 -- ╔═══════════════════════════════════════════════════════════════════════════╗
