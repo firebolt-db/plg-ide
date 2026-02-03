@@ -197,25 +197,65 @@ fi
 
 # --- Firebolt Cloud Setup ---
 if [ "$RUNTIME" = "cloud" ]; then
-    echo -e "  ${YELLOW}Firebolt Cloud requires credentials.${NC}"
-    echo -e "  ${CYAN}(Create a service account at https://go.firebolt.io/ if needed)${NC}"
+    echo -e "  ${YELLOW}Firebolt Cloud requires service account credentials.${NC}"
     echo ""
-    echo -e "  ${CYAN}Enter your Client ID and press Enter:${NC}"
-    read -p "  Client ID: " CLIENT_ID
-    echo -e "  ${CYAN}Enter your Client Secret and press Enter (input hidden):${NC}"
-    read -s -p "  Client Secret: " CLIENT_SECRET
+    echo -e "  ${CYAN}┌─────────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "  ${CYAN}│ ${BOLD}How to get your credentials:${NC}${CYAN}                                   │${NC}"
+    echo -e "  ${CYAN}│                                                                 │${NC}"
+    echo -e "  ${CYAN}│  1. Log in to ${BOLD}https://go.firebolt.io/${NC}${CYAN}                         │${NC}"
+    echo -e "  ${CYAN}│  2. Click your profile → ${BOLD}Govern${NC}${CYAN} → ${BOLD}Service accounts${NC}${CYAN}           │${NC}"
+    echo -e "  ${CYAN}│  3. Create a new service account (or use existing)             │${NC}"
+    echo -e "  ${CYAN}│  4. Copy the ${BOLD}Client ID${NC}${CYAN} and ${BOLD}Client Secret${NC}${CYAN}                     │${NC}"
+    echo -e "  ${CYAN}│                                                                 │${NC}"
+    echo -e "  ${CYAN}│  ${BOLD}Docs:${NC}${CYAN} https://docs.firebolt.io/godocs/Guides/managing-your-  │${NC}"
+    echo -e "  ${CYAN}│        organization/service-accounts.html                       │${NC}"
+    echo -e "  ${CYAN}└─────────────────────────────────────────────────────────────────┘${NC}"
     echo ""
+    echo -e "  ${BOLD}[A]${NC} Enter credentials now"
+    echo -e "  ${BOLD}[B]${NC} Skip for now (configure .env manually later)"
+    echo ""
+    echo -e "  ${CYAN}Type ${BOLD}A${NC}${CYAN} or ${BOLD}B${NC}${CYAN} and press Enter${NC}"
+    echo ""
+    read -p "  Your choice: " CRED_CHOICE
     
-    if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
-        echo -e "  ${RED}✗ Credentials required for Firebolt Cloud${NC}"
-        echo -e "  ${YELLOW}→ Create a service account at https://go.firebolt.io/${NC}"
-        PREREQ_PASSED=false
-    else
-        # Save to .env file
-        echo "FIREBOLT_CLIENT_ID=$CLIENT_ID" > .env
-        echo "FIREBOLT_CLIENT_SECRET=$CLIENT_SECRET" >> .env
-        echo -e "  ${GREEN}✓ Credentials saved to .env${NC}"
-    fi
+    case $CRED_CHOICE in
+        [Aa])
+            echo ""
+            echo -e "  ${CYAN}Enter your Client ID and press Enter:${NC}"
+            read -p "  Client ID: " CLIENT_ID
+            echo -e "  ${CYAN}Enter your Client Secret and press Enter (input hidden):${NC}"
+            read -s -p "  Client Secret: " CLIENT_SECRET
+            echo ""
+            echo -e "  ${CYAN}Enter your Account Name and press Enter:${NC}"
+            read -p "  Account Name: " ACCOUNT_NAME
+            
+            if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
+                echo -e "  ${RED}✗ Client ID and Secret are required${NC}"
+                PREREQ_PASSED=false
+            else
+                # Save to .env file
+                echo "FIREBOLT_CLIENT_ID=$CLIENT_ID" > .env
+                echo "FIREBOLT_CLIENT_SECRET=$CLIENT_SECRET" >> .env
+                [ -n "$ACCOUNT_NAME" ] && echo "FIREBOLT_ACCOUNT=$ACCOUNT_NAME" >> .env
+                echo -e "  ${GREEN}✓ Credentials saved to .env${NC}"
+            fi
+            ;;
+        [Bb])
+            echo ""
+            echo -e "  ${YELLOW}Skipped credential entry.${NC}"
+            echo -e "  ${CYAN}To configure later, create a ${BOLD}.env${NC}${CYAN} file with:${NC}"
+            echo ""
+            echo -e "    ${BOLD}FIREBOLT_CLIENT_ID${NC}=your-client-id"
+            echo -e "    ${BOLD}FIREBOLT_CLIENT_SECRET${NC}=your-client-secret"
+            echo -e "    ${BOLD}FIREBOLT_ACCOUNT${NC}=your-account-name"
+            echo ""
+            PREREQ_PASSED=false
+            ;;
+        *)
+            echo -e "  ${RED}Invalid selection. Skipping credential setup.${NC}"
+            PREREQ_PASSED=false
+            ;;
+    esac
 fi
 
 echo ""
