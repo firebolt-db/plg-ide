@@ -143,4 +143,4 @@ See [ROADMAP.md](ROADMAP.md) for planned verticals and features:
 
 ## License
 
-MIT
+Apache License 2.0. See [LICENSE](LICENSE).
