@@ -1,78 +1,46 @@
 -- =============================================================================
--- FIREBOLT plg-ide: Side-by-Side Comparison Demo
+-- FIREBOLT plg-ide: Side-by-Side Comparison Demo (impact first)
 -- =============================================================================
--- 
--- This script provides CLEAR before/after comparisons of aggregating indexes.
--- Run this AFTER demo_full.sql has set up the data and indexes.
 --
--- PURPOSE: Generate impressive metrics for demos, presentations, and training
--- 
--- ┌─────────────────────────────────────────────────────────────────────────────┐
--- │                    FOR PRESENTERS: KEY TALKING POINTS                       │
--- ├─────────────────────────────────────────────────────────────────────────────┤
--- │                                                                             │
--- │  VALUE PROPOSITION:                                                         │
--- │  "Firebolt's aggregating indexes deliver 50-100X faster queries with        │
--- │   99%+ reduction in data scanned. This translates to:"                      │
--- │   • Real-time dashboards instead of stale hourly reports                    │
--- │   • 99% lower query costs (pay for KB scanned, not GB)                     │
--- │   • Support 1000+ concurrent users on the same hardware                   │
--- │   • No code changes - your existing SQL just gets faster"                   │
--- │                                                                             │
--- │  COMPETITIVE ADVANTAGE:                                                    │
--- │  • "ClickHouse requires materialized views + manual refresh + maintenance" │
--- │  • "Snowflake has no equivalent - you pay for every full table scan"      │
--- │  • "BigQuery clustering helps but doesn't pre-compute aggregations"        │
--- │  • "Redshift requires complex VACUUM and ANALYZE operations"              │
--- │                                                                             │
--- │  BUSINESS IMPACT:                                                           │
--- │  • "Lurkit achieved 10X larger historical queries with 40% cost savings"   │
--- │  • "Every millisecond saved = better user experience"                      │
--- │  • "Cost savings scale linearly with data volume"                          │
--- │                                                                             │
--- └─────────────────────────────────────────────────────────────────────────────┘
--- 
+-- Design: Show the wow (fast query) first, then explain, then show slow for contrast.
+-- Run each section in order.
+--
+-- Prerequisite: Gaming tables and data (schema/01_tables.sql + data/load.sql, or demo_full.sql).
+--
 -- =============================================================================
 
 
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                    COMPARISON 1: LEADERBOARD QUERY                        ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
+-- =============================================================================
+-- Setup: Tracker table + ensure index exists + disable result cache
+-- =============================================================================
+-- demo_progress records which steps have been run (for IDE or app progress).
+-- Query progress: SELECT step_id, completed_at FROM demo_progress WHERE session_id = SESSION_USER() ORDER BY completed_at;
+-- We create the index here so the first query (step 1) is fast – impact first.
+-- =============================================================================
 
--- Disable cache for fair comparison
-SET enable_result_cache = FALSE;
+CREATE TABLE IF NOT EXISTS demo_progress (
+    session_id TEXT,
+    step_id TEXT,
+    completed_at TIMESTAMP
+);
 
--- -----------------------------------------------------------------------------
--- BEFORE: Without aggregating index (drop it first)
--- -----------------------------------------------------------------------------
-DROP AGGREGATING INDEX IF EXISTS playstats_leaderboard_agg;
-
--- Run and capture metrics
-SELECT 'LEADERBOARD - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
-SELECT 
-    playerid,
-    AVG(currentscore) AS avg_score,
-    SUM(currentplaytime) AS total_time,
-    MAX(currentlevel) AS max_level,
-    COUNT(*) AS events
-FROM playstats
-WHERE tournamentid = 1 AND gameid = 1
-GROUP BY playerid
-ORDER BY avg_score DESC
-LIMIT 10;
-
--- -----------------------------------------------------------------------------
--- AFTER: With aggregating index (re-create it)
--- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
     tournamentid, gameid, playerid,
     AVG(currentscore), SUM(currentplaytime), MAX(currentlevel), COUNT(*)
 );
 
-SELECT 'LEADERBOARD - WITH INDEX' AS test_name, NOW() AS started_at;
+SET enable_result_cache = FALSE;
 
+
+-- =============================================================================
+-- Step 1: Fast query (impact first)
+-- =============================================================================
+-- Run the leaderboard query with the aggregating index. Note how fast it is –
+-- that’s the wow. Same query later without the index will be much slower.
+-- -----------------------------------------------------------------------------
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '1', NOW());
 SELECT 
     playerid,
     AVG(currentscore) AS avg_score,
@@ -86,263 +54,80 @@ ORDER BY avg_score DESC
 LIMIT 10;
 
 
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                      COMPARISON 2: DAU METRICS                            ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
-
+-- =============================================================================
+-- Step 2: Explain (dig in – why it’s fast)
+-- =============================================================================
+-- See how Firebolt runs this query: the plan shows use of the aggregating index
+-- (pre-computed aggregates) instead of a full table scan.
 -- -----------------------------------------------------------------------------
--- BEFORE: Without aggregating index
--- -----------------------------------------------------------------------------
-DROP AGGREGATING INDEX IF EXISTS playstats_daily_agg;
 
-SELECT 'DAU METRICS - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '2', NOW());
+EXPLAIN (LOGICAL)
 SELECT 
-    DATE_TRUNC('day', stattime) AS day,
-    gameid,
-    COUNT(DISTINCT playerid) AS dau,
-    SUM(currentplaytime) AS total_time,
-    COUNT(*) AS events
-FROM playstats
-WHERE stattime >= CURRENT_DATE - INTERVAL '7 days'
-GROUP BY 1, 2
-ORDER BY day DESC, dau DESC
-LIMIT 20;
-
--- -----------------------------------------------------------------------------
--- AFTER: With aggregating index
--- -----------------------------------------------------------------------------
-CREATE AGGREGATING INDEX IF NOT EXISTS playstats_daily_agg
-ON playstats (
-    gameid, DATE_TRUNC('day', stattime),
-    SUM(currentplaytime), AVG(currentscore), COUNT(DISTINCT playerid), COUNT(*)
-);
-
-SELECT 'DAU METRICS - WITH INDEX' AS test_name, NOW() AS started_at;
-
-SELECT 
-    DATE_TRUNC('day', stattime) AS day,
-    gameid,
-    COUNT(DISTINCT playerid) AS dau,
-    SUM(currentplaytime) AS total_time,
-    COUNT(*) AS events
-FROM playstats
-WHERE stattime >= CURRENT_DATE - INTERVAL '7 days'
-GROUP BY 1, 2
-ORDER BY day DESC, dau DESC
-LIMIT 20;
-
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                    COMPARISON 3: PLAYER PROFILE                           ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
-
--- -----------------------------------------------------------------------------
--- BEFORE: Without aggregating index
--- -----------------------------------------------------------------------------
-DROP AGGREGATING INDEX IF EXISTS playstats_player_agg;
-
-SELECT 'PLAYER PROFILE - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
-SELECT 
-    gameid,
+    playerid,
     AVG(currentscore) AS avg_score,
     SUM(currentplaytime) AS total_time,
     MAX(currentlevel) AS max_level,
-    MIN(stattime) AS first_played,
-    MAX(stattime) AS last_played,
-    COUNT(*) AS sessions
+    COUNT(*) AS events
 FROM playstats
-WHERE playerid = 42
-GROUP BY gameid
-ORDER BY total_time DESC;
+WHERE tournamentid = 1 AND gameid = 1
+GROUP BY playerid
+ORDER BY avg_score DESC
+LIMIT 10;
 
+
+-- =============================================================================
+-- Step 3: Drop the index
+-- =============================================================================
+-- Remove the aggregating index so the next run of the same query does a full scan.
 -- -----------------------------------------------------------------------------
--- AFTER: With aggregating index
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '3', NOW());
+DROP AGGREGATING INDEX IF EXISTS playstats_leaderboard_agg;
+
+
+-- =============================================================================
+-- Step 4: Same query without index (slow – the contrast)
+-- =============================================================================
+-- Same SELECT as step 1. Compare query time: without the index, Firebolt scans
+-- raw playstats. At scale this cost grows; the index (step 1) reads pre-aggregated
+-- data instead. Impact first, then you’ve seen why it matters.
 -- -----------------------------------------------------------------------------
-CREATE AGGREGATING INDEX IF NOT EXISTS playstats_player_agg
-ON playstats (
-    playerid, gameid,
-    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel),
-    MIN(stattime), MAX(stattime), COUNT(*)
-);
 
-SELECT 'PLAYER PROFILE - WITH INDEX' AS test_name, NOW() AS started_at;
-
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '4', NOW());
 SELECT 
-    gameid,
+    playerid,
     AVG(currentscore) AS avg_score,
     SUM(currentplaytime) AS total_time,
     MAX(currentlevel) AS max_level,
-    MIN(stattime) AS first_played,
-    MAX(stattime) AS last_played,
-    COUNT(*) AS sessions
-FROM playstats
-WHERE playerid = 42
-GROUP BY gameid
-ORDER BY total_time DESC;
-
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                  COMPARISON 4: TOURNAMENT OVERVIEW                        ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
-
--- -----------------------------------------------------------------------------
--- BEFORE: Without aggregating index
--- -----------------------------------------------------------------------------
-DROP AGGREGATING INDEX IF EXISTS playstats_tournament_agg;
-
-SELECT 'TOURNAMENT OVERVIEW - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
-SELECT 
-    tournamentid,
-    COUNT(DISTINCT playerid) AS unique_players,
-    AVG(currentscore) AS avg_score,
-    MAX(currentscore) AS high_score,
-    SUM(currentplaytime) AS total_time,
     COUNT(*) AS events
 FROM playstats
-GROUP BY tournamentid
-ORDER BY events DESC
-LIMIT 20;
+WHERE tournamentid = 1 AND gameid = 1
+GROUP BY playerid
+ORDER BY avg_score DESC
+LIMIT 10;
 
+
+-- =============================================================================
+-- Step 5: Restore the index (optional)
+-- =============================================================================
+-- Re-create the index so you can run the fast query again.
 -- -----------------------------------------------------------------------------
--- AFTER: With aggregating index
--- -----------------------------------------------------------------------------
-CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '5', NOW());
+CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
-    tournamentid,
-    AVG(currentscore), MAX(currentscore), SUM(currentplaytime),
-    COUNT(DISTINCT playerid), COUNT(*)
+    tournamentid, gameid, playerid,
+    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel), COUNT(*)
 );
 
-SELECT 'TOURNAMENT OVERVIEW - WITH INDEX' AS test_name, NOW() AS started_at;
 
-SELECT 
-    tournamentid,
-    COUNT(DISTINCT playerid) AS unique_players,
-    AVG(currentscore) AS avg_score,
-    MAX(currentscore) AS high_score,
-    SUM(currentplaytime) AS total_time,
-    COUNT(*) AS events
-FROM playstats
-GROUP BY tournamentid
-ORDER BY events DESC
-LIMIT 20;
+-- =============================================================================
+-- Cleanup: re-enable result cache
+-- =============================================================================
+-- Restores normal cache behavior for subsequent queries.
+-- =============================================================================
 
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                    AUTOMATED BENCHMARK COMPARISON                         ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
--- This section runs benchmarks and reports the improvement factor
-
--- Create a table to store benchmark results
-CREATE TABLE IF NOT EXISTS benchmark_results (
-    test_name TEXT,
-    index_status TEXT,  -- 'without_index' or 'with_index'
-    query_time_ms REAL,
-    rows_scanned BIGINT,
-    run_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Clear previous results
-TRUNCATE TABLE benchmark_results;
-
--- -----------------------------------------------------------------------------
--- BENCHMARK: Tournament Query
--- Run multiple times and average
--- -----------------------------------------------------------------------------
-
--- Ensure indexes are in place for fair testing
-CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
-ON playstats (tournamentid, AVG(currentscore), MAX(currentscore), 
-              SUM(currentplaytime), COUNT(DISTINCT playerid), COUNT(*));
-
--- Quick performance check (you can capture EXPLAIN ANALYZE timing manually)
-SELECT 
-    '┌─────────────────────────────────────────────────────────────────┐' AS border
-UNION ALL SELECT 
-    '│           FIREBOLT AGGREGATING INDEX PERFORMANCE               │'
-UNION ALL SELECT 
-    '├─────────────────────────────────────────────────────────────────┤'
-UNION ALL SELECT 
-    '│ Feature: Aggregating Indexes                                   │'
-UNION ALL SELECT 
-    '│ Dataset: Ultra Fast Gaming (500K+ events)                      │'
-UNION ALL SELECT 
-    '│                                                                 │'
-UNION ALL SELECT 
-    '│ Expected Results:                                              │'
-UNION ALL SELECT 
-    '│   • Query Time:    50-100X faster                              │'
-UNION ALL SELECT 
-    '│   • Rows Scanned:  99%+ reduction                              │'
-UNION ALL SELECT 
-    '│   • Bytes Read:    99%+ reduction                              │'
-UNION ALL SELECT 
-    '│   • Cost Savings:  Proportional to data reduction              │'
-UNION ALL SELECT 
-    '│                                                                 │'
-UNION ALL SELECT 
-    '│ How It Works:                                                  │'
-UNION ALL SELECT 
-    '│   Aggregations are pre-computed at write time.                 │'
-UNION ALL SELECT 
-    '│   Queries read compact summaries instead of raw data.          │'
-UNION ALL SELECT 
-    '│   No code changes needed - same SQL, automatic optimization.   │'
-UNION ALL SELECT 
-    '└─────────────────────────────────────────────────────────────────┘';
-
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                         DATA INSIGHTS QUERIES                             ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
--- Bonus: Interesting queries to explore the data
-
--- Top 10 most active players (total play time)
-SELECT 
-    p.nickname,
-    p.agecategory,
-    p.issubscribedtonewsletter,
-    SUM(ps.currentplaytime) / 3600.0 AS total_hours_played,
-    COUNT(DISTINCT ps.gameid) AS games_played,
-    MAX(ps.currentlevel) AS highest_level
-FROM playstats ps
-JOIN players p ON ps.playerid = p.playerid
-GROUP BY p.playerid, p.nickname, p.agecategory, p.issubscribedtonewsletter
-ORDER BY total_hours_played DESC
-LIMIT 10;
-
--- Game popularity by selected car (proxy for platform in Firebolt.io schema)
-SELECT 
-    g.title,
-    g.category,
-    ps.selectedcar,
-    COUNT(DISTINCT ps.playerid) AS unique_players,
-    SUM(ps.currentplaytime) / 3600.0 AS total_hours,
-    AVG(ps.currentscore) AS avg_score
-FROM playstats ps
-JOIN games g ON ps.gameid = g.gameid
-GROUP BY g.gameid, g.title, g.category, ps.selectedcar
-ORDER BY unique_players DESC
-LIMIT 20;
-
--- Tournament prize pool vs engagement
-SELECT 
-    t.name,
-    t.totalprizedollars,
-    COUNT(DISTINCT ps.playerid) AS participants,
-    SUM(ps.currentplaytime) / 3600.0 AS total_hours,
-    t.totalprizedollars / NULLIF(COUNT(DISTINCT ps.playerid), 0) AS prize_per_player
-FROM tournaments t
-JOIN playstats ps ON t.tournamentid = ps.tournamentid
-GROUP BY t.tournamentid, t.name, t.totalprizedollars
-ORDER BY totalprizedollars DESC
-LIMIT 10;
-
-
--- Re-enable cache
 SET enable_result_cache = TRUE;
 
 SELECT 'Comparison demo complete!' AS status;

@@ -1,34 +1,27 @@
 -- =============================================================================
--- FIREBOLT plg-ide: E-commerce Side-by-Side Comparison Demo
+-- FIREBOLT plg-ide: E-commerce Comparison Demo (impact first)
 -- =============================================================================
--- Run this AFTER demo_full.sql (or schema + data/load.sql) has set up data.
 --
--- VALUE PROPOSITION:
--- "Firebolt's aggregating indexes deliver 50-100X faster queries with 99%+ 
---  reduction in data scanned. For e-commerce: real-time dashboards, customer 360 
---  in milliseconds, and cost savings proportional to data volume."
+-- Design: Show the wow (fast query) first, then explain, then show slow for contrast.
+-- Run each section in order.
+--
+-- Prerequisite: E-commerce tables and data (schema/01_tables.sql + data/load.sql).
+--
 -- =============================================================================
 
-SET enable_result_cache = FALSE;
 
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║              COMPARISON 1: DAILY REVENUE TRENDS                           ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
+-- =============================================================================
+-- Setup: Tracker table + ensure index exists + disable result cache
+-- =============================================================================
+-- demo_progress records which steps have been run (for IDE or app progress).
+-- Query progress: SELECT step_id, completed_at FROM demo_progress WHERE session_id = SESSION_USER() ORDER BY completed_at;
+-- =============================================================================
 
-DROP AGGREGATING INDEX IF EXISTS order_items_daily_agg;
-
-SELECT 'DAILY REVENUE - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
-SELECT 
-    DATE_TRUNC('day', created_at) AS day,
-    COUNT(DISTINCT order_id) AS order_count,
-    SUM(subtotal) AS total_revenue,
-    AVG(subtotal) AS avg_order_value
-FROM order_items
-WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
-GROUP BY DATE_TRUNC('day', created_at)
-ORDER BY day DESC
-LIMIT 30;
+CREATE TABLE IF NOT EXISTS demo_progress (
+    session_id TEXT,
+    step_id TEXT,
+    completed_at TIMESTAMP
+);
 
 CREATE AGGREGATING INDEX IF NOT EXISTS order_items_daily_agg
 ON order_items (
@@ -41,8 +34,16 @@ ON order_items (
     COUNT(*)
 );
 
-SELECT 'DAILY REVENUE - WITH INDEX' AS test_name, NOW() AS started_at;
+SET enable_result_cache = FALSE;
 
+
+-- =============================================================================
+-- Step 1: Fast query (impact first)
+-- =============================================================================
+-- Daily revenue with the aggregating index. Note how fast it is.
+-- -----------------------------------------------------------------------------
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '1', NOW());
 SELECT 
     DATE_TRUNC('day', created_at) AS day,
     COUNT(DISTINCT order_id) AS order_count,
@@ -55,103 +56,81 @@ ORDER BY day DESC
 LIMIT 30;
 
 
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║              COMPARISON 2: PRODUCT SALES BY BRAND                         ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
+-- =============================================================================
+-- Step 2: Explain (dig in – why it's fast)
+-- =============================================================================
+-- Plan shows use of the aggregating index instead of a full table scan.
+-- -----------------------------------------------------------------------------
 
-DROP AGGREGATING INDEX IF EXISTS order_items_product_sales_agg;
-
-SELECT 'PRODUCT SALES BY BRAND - WITHOUT INDEX' AS test_name, NOW() AS started_at;
-
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '2', NOW());
+EXPLAIN (LOGICAL)
 SELECT 
-    p.brand,
-    SUM(oi.quantity) AS total_quantity_sold,
-    SUM(oi.subtotal) AS total_revenue,
-    COUNT(DISTINCT oi.order_id) AS order_count
-FROM order_items oi
-JOIN products p ON oi.product_id = p.product_id
-WHERE oi.created_at >= CURRENT_DATE - INTERVAL '7 days'
-GROUP BY p.brand
-ORDER BY total_revenue DESC
-LIMIT 20;
+    DATE_TRUNC('day', created_at) AS day,
+    COUNT(DISTINCT order_id) AS order_count,
+    SUM(subtotal) AS total_revenue,
+    AVG(subtotal) AS avg_order_value
+FROM order_items
+WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY DATE_TRUNC('day', created_at)
+ORDER BY day DESC
+LIMIT 30;
 
-CREATE AGGREGATING INDEX IF NOT EXISTS order_items_product_sales_agg
+
+-- =============================================================================
+-- Step 3: Drop the index
+-- =============================================================================
+-- -----------------------------------------------------------------------------
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '3', NOW());
+DROP AGGREGATING INDEX IF EXISTS order_items_daily_agg;
+
+
+-- =============================================================================
+-- Step 4: Same query without index (slow – the contrast)
+-- =============================================================================
+-- Same SELECT as step 1. Compare query time to step 1.
+-- -----------------------------------------------------------------------------
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '4', NOW());
+SELECT 
+    DATE_TRUNC('day', created_at) AS day,
+    COUNT(DISTINCT order_id) AS order_count,
+    SUM(subtotal) AS total_revenue,
+    AVG(subtotal) AS avg_order_value
+FROM order_items
+WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY DATE_TRUNC('day', created_at)
+ORDER BY day DESC
+LIMIT 30;
+
+
+-- =============================================================================
+-- Step 5: Restore the index (optional)
+-- =============================================================================
+-- -----------------------------------------------------------------------------
+
+INSERT INTO demo_progress (session_id, step_id, completed_at) VALUES (SESSION_USER(), '5', NOW());
+CREATE AGGREGATING INDEX IF NOT EXISTS order_items_daily_agg
 ON order_items (
-    product_id,
     DATE_TRUNC('day', created_at),
-    SUM(quantity),
     SUM(subtotal),
+    SUM(quantity),
     COUNT(DISTINCT order_id),
-    AVG(unit_price),
+    COUNT(DISTINCT product_id),
+    AVG(subtotal),
     COUNT(*)
 );
 
-SELECT 'PRODUCT SALES BY BRAND - WITH INDEX' AS test_name, NOW() AS started_at;
 
-SELECT 
-    p.brand,
-    SUM(oi.quantity) AS total_quantity_sold,
-    SUM(oi.subtotal) AS total_revenue,
-    COUNT(DISTINCT oi.order_id) AS order_count
-FROM order_items oi
-JOIN products p ON oi.product_id = p.product_id
-WHERE oi.created_at >= CURRENT_DATE - INTERVAL '7 days'
-GROUP BY p.brand
-ORDER BY total_revenue DESC
-LIMIT 20;
-
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                    VALUE PROPOSITION SUMMARY                             ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
-
-SELECT 
-    '┌─────────────────────────────────────────────────────────────────┐' AS border
-UNION ALL SELECT 
-    '│         FIREBOLT AGGREGATING INDEX - E-COMMERCE                 │'
-UNION ALL SELECT 
-    '├─────────────────────────────────────────────────────────────────┤'
-UNION ALL SELECT 
-    '│ Feature: Aggregating Indexes on order_items                     │'
-UNION ALL SELECT 
-    '│ Dataset: E-commerce (5M+ order line items)                      │'
-UNION ALL SELECT 
-    '│                                                                 │'
-UNION ALL SELECT 
-    '│ Expected: 50-100X faster, 99%+ less data scanned                │'
-UNION ALL SELECT 
-    '│ Business: Real-time dashboards, customer 360, cost savings     │'
-UNION ALL SELECT 
-    '└─────────────────────────────────────────────────────────────────┘';
-
-
--- ╔═══════════════════════════════════════════════════════════════════════════╗
--- ║                         DATA INSIGHTS QUERIES                             ║
--- ╚═══════════════════════════════════════════════════════════════════════════╝
-
-SELECT 
-    c.tier,
-    COUNT(DISTINCT o.customer_id) AS customers,
-    SUM(oi.subtotal) AS total_revenue,
-    AVG(oi.subtotal) AS avg_order_value
-FROM order_items oi
-JOIN orders o ON oi.order_id = o.order_id
-JOIN customers c ON o.customer_id = c.customer_id
-WHERE oi.created_at >= CURRENT_DATE - INTERVAL '90 days'
-GROUP BY c.tier
-ORDER BY total_revenue DESC;
-
-SELECT 
-    p.category_id,
-    SUM(oi.quantity) AS units_sold,
-    SUM(oi.subtotal) AS revenue
-FROM order_items oi
-JOIN products p ON oi.product_id = p.product_id
-WHERE oi.created_at >= CURRENT_DATE - INTERVAL '7 days'
-GROUP BY p.category_id
-ORDER BY revenue DESC
-LIMIT 10;
+-- =============================================================================
+-- Cleanup: re-enable result cache
+-- =============================================================================
+-- -----------------------------------------------------------------------------
 
 SET enable_result_cache = TRUE;
 
 SELECT 'E-commerce comparison demo complete!' AS status;
+
+-- =============================================================================
+-- END OF COMPARISON DEMO
+-- =============================================================================

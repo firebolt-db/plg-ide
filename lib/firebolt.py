@@ -5,6 +5,8 @@ Provides a unified interface for both Firebolt Cloud and Firebolt Core,
 with benchmarking capabilities for feature demonstrations.
 """
 
+from __future__ import annotations
+
 import os
 import time
 import json
