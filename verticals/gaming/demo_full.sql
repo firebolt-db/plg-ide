@@ -115,40 +115,52 @@ SELECT
 -- These represent a typical gaming platform's data model
 
 -- -----------------------------------------------------------------------------
--- DIMENSION TABLES (small, lookup data)
+-- DIMENSION TABLES (aligned with Firebolt.io Ultra Fast Gaming schema)
 -- -----------------------------------------------------------------------------
 
 -- Players table - user accounts
-CREATE TABLE IF NOT EXISTS players (
-    player_id INT,
-    username TEXT,
-    email TEXT,
-    registration_date DATE,
-    subscription_type TEXT,  -- 'free', 'premium', 'pro'
-    country TEXT,
-    platform TEXT            -- 'pc', 'console', 'mobile'
-) PRIMARY INDEX player_id;
+CREATE DIMENSION TABLE IF NOT EXISTS players (
+    playerid INTEGER NULL,
+    nickname TEXT NULL,
+    email TEXT NULL,
+    agecategory TEXT NULL,
+    platforms ARRAY(TEXT NULL) NULL,
+    registeredon DATE NULL,
+    issubscribedtonewsletter BOOLEAN NULL,
+    internalprobabilitytowin DOUBLE PRECISION NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX agecategory, registeredon;
 
 -- Games table - game catalog
-CREATE TABLE IF NOT EXISTS games (
-    game_id INT,
-    game_name TEXT,
-    genre TEXT,
-    publisher TEXT,
-    release_date DATE,
-    rating REAL
-) PRIMARY INDEX game_id;
+CREATE DIMENSION TABLE IF NOT EXISTS games (
+    gameid INTEGER NULL,
+    title TEXT NULL,
+    abbreviation TEXT NULL,
+    series TEXT NULL,
+    version NUMERIC(10, 2) NULL,
+    gamedescription TEXT NULL,
+    category TEXT NULL,
+    launchdate DATE NULL,
+    author TEXT NULL,
+    supportedplatforms ARRAY(TEXT NULL) NULL,
+    gameconfiguration TEXT NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX gameid, title;
 
 -- Tournaments table - competitive events
-CREATE TABLE IF NOT EXISTS tournaments (
-    tournament_id INT,
-    game_id INT,
-    tournament_name TEXT,
-    start_date TIMESTAMP,
-    end_date TIMESTAMP,
-    prize_pool DECIMAL(12, 2),
-    status TEXT              -- 'upcoming', 'active', 'completed'
-) PRIMARY INDEX tournament_id;
+CREATE DIMENSION TABLE IF NOT EXISTS tournaments (
+    tournamentid INTEGER NULL,
+    name TEXT NULL,
+    gameid INTEGER NULL,
+    totalprizedollars INTEGER NULL,
+    startdatetime TIMESTAMP NULL,
+    enddatetime TIMESTAMP NULL,
+    rulesdefinition TEXT NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX tournamentid;
 
 -- -----------------------------------------------------------------------------
 -- FACT TABLE (high-volume event data)
@@ -158,17 +170,20 @@ CREATE TABLE IF NOT EXISTS tournaments (
 -- This is where aggregating indexes provide MASSIVE value
 -- In production, this table often has billions of rows
 CREATE TABLE IF NOT EXISTS playstats (
-    stat_id BIGINT,
-    player_id INT,
-    game_id INT,
-    tournament_id INT,
-    stat_time TIMESTAMP,
-    current_score INT,
-    current_level INT,
-    current_play_time INT,   -- seconds played in session
-    platform TEXT,
-    session_id TEXT
-) PRIMARY INDEX stat_id;
+    gameid INTEGER NULL,
+    playerid INTEGER NULL,
+    stattime TIMESTAMP NULL,
+    selectedcar TEXT NULL,
+    currentlevel INTEGER NULL,
+    currentspeed REAL NULL,
+    currentplaytime BIGINT NULL,
+    currentscore BIGINT NULL,
+    event TEXT NULL,
+    errorcode TEXT NULL,
+    tournamentid INTEGER NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX tournamentid, gameid, playerid, stattime;
 
 -- Verify tables created
 SELECT 'Schema created successfully!' AS status;
@@ -200,54 +215,53 @@ SHOW TABLES;
 -- Creates: 10K players, 100 games, 500 tournaments, 500K play events
 -- Approximate load time: 5-30 seconds depending on engine size
 
--- Insert sample players
-INSERT INTO players (player_id, username, email, registration_date, subscription_type, country, platform)
+-- Insert sample players (Firebolt.io schema columns)
+INSERT INTO players (playerid, nickname, email, agecategory, platforms, registeredon, issubscribedtonewsletter, internalprobabilitytowin)
 SELECT 
-    seq AS player_id,
-    'player_' || seq::TEXT AS username,
+    seq AS playerid,
+    'player_' || seq::TEXT AS nickname,
     'player_' || seq::TEXT || '@gaming.com' AS email,
-    DATE '2023-01-01' + (seq % 365) AS registration_date,
-    CASE seq % 3 WHEN 0 THEN 'free' WHEN 1 THEN 'premium' ELSE 'pro' END AS subscription_type,
-    CASE seq % 5 WHEN 0 THEN 'USA' WHEN 1 THEN 'UK' WHEN 2 THEN 'Germany' WHEN 3 THEN 'Japan' ELSE 'Brazil' END AS country,
-    CASE seq % 3 WHEN 0 THEN 'pc' WHEN 1 THEN 'console' ELSE 'mobile' END AS platform
+    CASE seq % 4 WHEN 0 THEN 'junior' WHEN 1 THEN 'adult' WHEN 2 THEN 'senior' ELSE 'all' END AS agecategory,
+    CASE seq % 3 WHEN 0 THEN ARRAY['pc'] WHEN 1 THEN ARRAY['console'] ELSE ARRAY['mobile'] END AS platforms,
+    DATE '2023-01-01' + (seq % 365) AS registeredon,
+    (seq % 2) = 0 AS issubscribedtonewsletter,
+    (seq % 100) / 100.0 AS internalprobabilitytowin
 FROM generate_series(1, 10000) AS t(seq);
 
--- Insert sample games
-INSERT INTO games (game_id, game_name, genre, publisher, release_date, rating)
+-- Insert sample games (Firebolt.io schema columns)
+INSERT INTO games (gameid, title, category, launchdate)
 SELECT 
-    seq AS game_id,
-    'Game_' || seq::TEXT AS game_name,
-    CASE seq % 5 WHEN 0 THEN 'Action' WHEN 1 THEN 'RPG' WHEN 2 THEN 'Strategy' WHEN 3 THEN 'Sports' ELSE 'Puzzle' END AS genre,
-    'Publisher_' || (seq % 10)::TEXT AS publisher,
-    DATE '2020-01-01' + (seq * 30) AS release_date,
-    3.0 + (seq % 20) / 10.0 AS rating
+    seq AS gameid,
+    'Game_' || seq::TEXT AS title,
+    CASE seq % 5 WHEN 0 THEN 'Action' WHEN 1 THEN 'RPG' WHEN 2 THEN 'Strategy' WHEN 3 THEN 'Sports' ELSE 'Puzzle' END AS category,
+    DATE '2020-01-01' + (seq * 30) AS launchdate
 FROM generate_series(1, 100) AS t(seq);
 
--- Insert sample tournaments
-INSERT INTO tournaments (tournament_id, game_id, tournament_name, start_date, end_date, prize_pool, status)
+-- Insert sample tournaments (Firebolt.io schema columns)
+INSERT INTO tournaments (tournamentid, name, gameid, totalprizedollars, startdatetime, enddatetime)
 SELECT 
-    seq AS tournament_id,
-    (seq % 100) + 1 AS game_id,
-    'Tournament_' || seq::TEXT AS tournament_name,
-    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 day' * seq AS start_date,
-    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 day' * seq + INTERVAL '7 days' AS end_date,
-    (seq * 1000)::DECIMAL(12,2) AS prize_pool,
-    CASE seq % 3 WHEN 0 THEN 'completed' WHEN 1 THEN 'active' ELSE 'upcoming' END AS status
+    seq AS tournamentid,
+    'Tournament_' || seq::TEXT AS name,
+    (seq % 100) + 1 AS gameid,
+    seq * 1000 AS totalprizedollars,
+    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 day' * seq AS startdatetime,
+    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 day' * seq + INTERVAL '7 days' AS enddatetime
 FROM generate_series(1, 500) AS t(seq);
 
--- Insert sample playstats (the high-volume table - 500K rows for demo)
-INSERT INTO playstats (stat_id, player_id, game_id, tournament_id, stat_time, current_score, current_level, current_play_time, platform, session_id)
+-- Insert sample playstats (Firebolt.io schema columns - 500K rows for demo)
+INSERT INTO playstats (gameid, playerid, stattime, selectedcar, currentlevel, currentspeed, currentplaytime, currentscore, event, errorcode, tournamentid)
 SELECT 
-    seq AS stat_id,
-    (seq % 10000) + 1 AS player_id,
-    (seq % 100) + 1 AS game_id,
-    (seq % 500) + 1 AS tournament_id,
-    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 second' * seq AS stat_time,
-    (seq % 10000) + 100 AS current_score,
-    (seq % 100) + 1 AS current_level,
-    (seq % 3600) + 60 AS current_play_time,
-    CASE seq % 3 WHEN 0 THEN 'pc' WHEN 1 THEN 'console' ELSE 'mobile' END AS platform,
-    'session_' || (seq % 50000)::TEXT AS session_id
+    (seq % 100) + 1 AS gameid,
+    (seq % 10000) + 1 AS playerid,
+    TIMESTAMP '2024-01-01 00:00:00' + INTERVAL '1 second' * seq AS stattime,
+    'car_' || (seq % 10)::TEXT AS selectedcar,
+    (seq % 100) + 1 AS currentlevel,
+    (seq % 200) / 10.0 AS currentspeed,
+    (seq % 3600) + 60 AS currentplaytime,
+    (seq % 10000) + 100 AS currentscore,
+    'play' AS event,
+    NULL AS errorcode,
+    (seq % 500) + 1 AS tournamentid
 FROM generate_series(1, 500000) AS t(seq);
 
 -- Verify data loaded
@@ -350,17 +364,17 @@ SELECT '>>> BASELINE QUERY 1: Tournament Leaderboard <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    p.player_id,
-    p.username,
-    AVG(ps.current_score) AS avg_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
-    MAX(ps.current_level) AS max_level_reached,
+    p.playerid,
+    p.nickname,
+    AVG(ps.currentscore) AS avg_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
+    MAX(ps.currentlevel) AS max_level_reached,
     COUNT(*) AS total_events
 FROM playstats ps
-JOIN players p ON ps.player_id = p.player_id
-WHERE ps.tournament_id = 1 
-  AND ps.game_id = 1
-GROUP BY p.player_id, p.username
+JOIN players p ON ps.playerid = p.playerid
+WHERE ps.tournamentid = 1 
+  AND ps.gameid = 1
+GROUP BY p.playerid, p.nickname
 ORDER BY avg_score DESC
 LIMIT 20;
 
@@ -375,15 +389,15 @@ SELECT '>>> BASELINE QUERY 2: Daily Active Users <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    DATE_TRUNC('day', stat_time) AS day,
-    game_id,
-    COUNT(DISTINCT player_id) AS daily_active_users,
-    SUM(current_play_time) AS total_play_time_seconds,
-    AVG(current_score) AS avg_score,
+    DATE_TRUNC('day', stattime) AS day,
+    gameid,
+    COUNT(DISTINCT playerid) AS daily_active_users,
+    SUM(currentplaytime) AS total_play_time_seconds,
+    AVG(currentscore) AS avg_score,
     COUNT(*) AS total_events
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '30 days'
-GROUP BY DATE_TRUNC('day', stat_time), game_id
+WHERE stattime >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY DATE_TRUNC('day', stattime), gameid
 ORDER BY day DESC, daily_active_users DESC
 LIMIT 50;
 
@@ -392,23 +406,23 @@ LIMIT 50;
 -- -----------------------------------------------------------------------------
 -- BASELINE QUERY 3: Player Profile
 -- Business question: "Show me player 42's stats across all games"
--- Without index: Must scan all playstats looking for player_id = 42
+-- Without index: Must scan all playstats looking for playerid = 42
 -- -----------------------------------------------------------------------------
 SELECT '>>> BASELINE QUERY 3: Player Profile <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    g.game_name,
-    AVG(ps.current_score) AS avg_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
-    MAX(ps.current_level) AS max_level,
-    MIN(ps.stat_time) AS first_played,
-    MAX(ps.stat_time) AS last_played,
+    g.title,
+    AVG(ps.currentscore) AS avg_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
+    MAX(ps.currentlevel) AS max_level,
+    MIN(ps.stattime) AS first_played,
+    MAX(ps.stattime) AS last_played,
     COUNT(*) AS total_sessions
 FROM playstats ps
-JOIN games g ON ps.game_id = g.game_id
-WHERE ps.player_id = 42
-GROUP BY g.game_id, g.game_name
+JOIN games g ON ps.gameid = g.gameid
+WHERE ps.playerid = 42
+GROUP BY g.gameid, g.title
 ORDER BY total_play_time_seconds DESC;
 
 -- Record this timing: _____________ ms
@@ -422,16 +436,16 @@ SELECT '>>> BASELINE QUERY 4: Tournament Overview <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    t.tournament_name,
-    t.prize_pool,
-    COUNT(DISTINCT ps.player_id) AS unique_players,
-    AVG(ps.current_score) AS avg_score,
-    MAX(ps.current_score) AS high_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
+    t.name,
+    t.totalprizedollars,
+    COUNT(DISTINCT ps.playerid) AS unique_players,
+    AVG(ps.currentscore) AS avg_score,
+    MAX(ps.currentscore) AS high_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
     COUNT(*) AS total_events
 FROM playstats ps
-JOIN tournaments t ON ps.tournament_id = t.tournament_id
-GROUP BY t.tournament_id, t.tournament_name, t.prize_pool
+JOIN tournaments t ON ps.tournamentid = t.tournamentid
+GROUP BY t.tournamentid, t.name, t.totalprizedollars
 ORDER BY total_events DESC
 LIMIT 50;
 
@@ -507,19 +521,19 @@ SELECT 'Stage 3 complete - record your baseline timings above!' AS status;
 -- Matches: Tournament leaderboard queries (GROUP BY tournament, game, player)
 -- 
 -- WHY THESE COLUMNS?
--- • tournament_id, game_id: We filter by these (WHERE tournament_id = X)
--- • player_id: We group by this (GROUP BY player_id)
--- • AVG(current_score): We compute this in the SELECT
+-- • tournamentid, gameid: We filter by these (WHERE tournamentid = X)
+-- • playerid: We group by this (GROUP BY playerid)
+-- • AVG(currentscore): We compute this in the SELECT
 -- • SUM, MAX, COUNT: Other aggregations we need
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
-    tournament_id,
-    game_id,
-    player_id,
-    AVG(current_score),
-    SUM(current_play_time),
-    MAX(current_level),
+    tournamentid,
+    gameid,
+    playerid,
+    AVG(currentscore),
+    SUM(currentplaytime),
+    MAX(currentlevel),
     COUNT(*)
 );
 
@@ -529,11 +543,11 @@ ON playstats (
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_daily_agg
 ON playstats (
-    game_id,
-    DATE_TRUNC('day', stat_time),
-    SUM(current_play_time),
-    AVG(current_score),
-    COUNT(DISTINCT player_id),
+    gameid,
+    DATE_TRUNC('day', stattime),
+    SUM(currentplaytime),
+    AVG(currentscore),
+    COUNT(DISTINCT playerid),
     COUNT(*)
 );
 
@@ -543,13 +557,13 @@ ON playstats (
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_player_agg
 ON playstats (
-    player_id,
-    game_id,
-    AVG(current_score),
-    SUM(current_play_time),
-    MAX(current_level),
-    MIN(stat_time),
-    MAX(stat_time),
+    playerid,
+    gameid,
+    AVG(currentscore),
+    SUM(currentplaytime),
+    MAX(currentlevel),
+    MIN(stattime),
+    MAX(stattime),
     COUNT(*)
 );
 
@@ -559,11 +573,11 @@ ON playstats (
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
-    tournament_id,
-    AVG(current_score),
-    MAX(current_score),
-    SUM(current_play_time),
-    COUNT(DISTINCT player_id),
+    tournamentid,
+    AVG(currentscore),
+    MAX(currentscore),
+    SUM(currentplaytime),
+    COUNT(DISTINCT playerid),
     COUNT(*)
 );
 
@@ -617,17 +631,17 @@ SELECT '>>> OPTIMIZED QUERY 1: Tournament Leaderboard <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    p.player_id,
-    p.username,
-    AVG(ps.current_score) AS avg_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
-    MAX(ps.current_level) AS max_level_reached,
+    p.playerid,
+    p.nickname,
+    AVG(ps.currentscore) AS avg_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
+    MAX(ps.currentlevel) AS max_level_reached,
     COUNT(*) AS total_events
 FROM playstats ps
-JOIN players p ON ps.player_id = p.player_id
-WHERE ps.tournament_id = 1 
-  AND ps.game_id = 1
-GROUP BY p.player_id, p.username
+JOIN players p ON ps.playerid = p.playerid
+WHERE ps.tournamentid = 1 
+  AND ps.gameid = 1
+GROUP BY p.playerid, p.nickname
 ORDER BY avg_score DESC
 LIMIT 20;
 
@@ -642,15 +656,15 @@ SELECT '>>> OPTIMIZED QUERY 2: Daily Active Users <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    DATE_TRUNC('day', stat_time) AS day,
-    game_id,
-    COUNT(DISTINCT player_id) AS daily_active_users,
-    SUM(current_play_time) AS total_play_time_seconds,
-    AVG(current_score) AS avg_score,
+    DATE_TRUNC('day', stattime) AS day,
+    gameid,
+    COUNT(DISTINCT playerid) AS daily_active_users,
+    SUM(currentplaytime) AS total_play_time_seconds,
+    AVG(currentscore) AS avg_score,
     COUNT(*) AS total_events
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '30 days'
-GROUP BY DATE_TRUNC('day', stat_time), game_id
+WHERE stattime >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY DATE_TRUNC('day', stattime), gameid
 ORDER BY day DESC, daily_active_users DESC
 LIMIT 50;
 
@@ -665,17 +679,17 @@ SELECT '>>> OPTIMIZED QUERY 3: Player Profile <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    g.game_name,
-    AVG(ps.current_score) AS avg_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
-    MAX(ps.current_level) AS max_level,
-    MIN(ps.stat_time) AS first_played,
-    MAX(ps.stat_time) AS last_played,
+    g.title,
+    AVG(ps.currentscore) AS avg_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
+    MAX(ps.currentlevel) AS max_level,
+    MIN(ps.stattime) AS first_played,
+    MAX(ps.stattime) AS last_played,
     COUNT(*) AS total_sessions
 FROM playstats ps
-JOIN games g ON ps.game_id = g.game_id
-WHERE ps.player_id = 42
-GROUP BY g.game_id, g.game_name
+JOIN games g ON ps.gameid = g.gameid
+WHERE ps.playerid = 42
+GROUP BY g.gameid, g.title
 ORDER BY total_play_time_seconds DESC;
 
 -- Compare to baseline: _____________ ms → _____________ ms (____X faster)
@@ -689,16 +703,16 @@ SELECT '>>> OPTIMIZED QUERY 4: Tournament Overview <<<' AS query_name;
 
 EXPLAIN ANALYZE
 SELECT 
-    t.tournament_name,
-    t.prize_pool,
-    COUNT(DISTINCT ps.player_id) AS unique_players,
-    AVG(ps.current_score) AS avg_score,
-    MAX(ps.current_score) AS high_score,
-    SUM(ps.current_play_time) AS total_play_time_seconds,
+    t.name,
+    t.totalprizedollars,
+    COUNT(DISTINCT ps.playerid) AS unique_players,
+    AVG(ps.currentscore) AS avg_score,
+    MAX(ps.currentscore) AS high_score,
+    SUM(ps.currentplaytime) AS total_play_time_seconds,
     COUNT(*) AS total_events
 FROM playstats ps
-JOIN tournaments t ON ps.tournament_id = t.tournament_id
-GROUP BY t.tournament_id, t.tournament_name, t.prize_pool
+JOIN tournaments t ON ps.tournamentid = t.tournamentid
+GROUP BY t.tournamentid, t.name, t.totalprizedollars
 ORDER BY total_events DESC
 LIMIT 50;
 
@@ -738,12 +752,12 @@ SELECT '>>> Verifying fast performance with index <<<' AS step;
 
 EXPLAIN ANALYZE
 SELECT 
-    tournament_id,
-    COUNT(DISTINCT player_id) AS unique_players,
-    AVG(current_score) AS avg_score,
-    MAX(current_score) AS high_score
+    tournamentid,
+    COUNT(DISTINCT playerid) AS unique_players,
+    AVG(currentscore) AS avg_score,
+    MAX(currentscore) AS high_score
 FROM playstats
-GROUP BY tournament_id
+GROUP BY tournamentid
 ORDER BY unique_players DESC
 LIMIT 10;
 
@@ -763,12 +777,12 @@ SELECT '>>> Same query WITHOUT index - should be SLOW <<<' AS step;
 
 EXPLAIN ANALYZE
 SELECT 
-    tournament_id,
-    COUNT(DISTINCT player_id) AS unique_players,
-    AVG(current_score) AS avg_score,
-    MAX(current_score) AS high_score
+    tournamentid,
+    COUNT(DISTINCT playerid) AS unique_players,
+    AVG(currentscore) AS avg_score,
+    MAX(currentscore) AS high_score
 FROM playstats
-GROUP BY tournament_id
+GROUP BY tournamentid
 ORDER BY unique_players DESC
 LIMIT 10;
 
@@ -782,23 +796,23 @@ SELECT '>>> Re-creating index - performance restored! <<<' AS step;
 
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
-    tournament_id,
-    AVG(current_score),
-    MAX(current_score),
-    SUM(current_play_time),
-    COUNT(DISTINCT player_id),
+    tournamentid,
+    AVG(currentscore),
+    MAX(currentscore),
+    SUM(currentplaytime),
+    COUNT(DISTINCT playerid),
     COUNT(*)
 );
 
 -- Verify it's fast again
 EXPLAIN ANALYZE
 SELECT 
-    tournament_id,
-    COUNT(DISTINCT player_id) AS unique_players,
-    AVG(current_score) AS avg_score,
-    MAX(current_score) AS high_score
+    tournamentid,
+    COUNT(DISTINCT playerid) AS unique_players,
+    AVG(currentscore) AS avg_score,
+    MAX(currentscore) AS high_score
 FROM playstats
-GROUP BY tournament_id
+GROUP BY tournamentid
 ORDER BY unique_players DESC
 LIMIT 10;
 

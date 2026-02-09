@@ -47,10 +47,10 @@ SELECT 'tournaments', COUNT(*) FROM tournaments
 UNION ALL
 SELECT 'playstats', COUNT(*) FROM playstats;
 
--- Check playstats date range
+-- Check playstats date range (Firebolt.io schema column names)
 SELECT 
-    MIN(stat_time) as earliest,
-    MAX(stat_time) as latest,
-    COUNT(DISTINCT player_id) as unique_players,
-    COUNT(DISTINCT game_id) as unique_games
+    MIN(stattime) AS earliest,
+    MAX(stattime) AS latest,
+    COUNT(DISTINCT playerid) AS unique_players,
+    COUNT(DISTINCT gameid) AS unique_games
 FROM playstats;

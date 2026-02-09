@@ -13,15 +13,15 @@ SET enable_result_cache = FALSE;
 
 EXPLAIN ANALYZE
 SELECT 
-    player_id,
-    AVG(current_score) as avg_score,
-    SUM(current_play_time) as total_time,
-    MAX(current_level) as max_level,
+    playerid,
+    AVG(currentscore) as avg_score,
+    SUM(currentplaytime) as total_time,
+    MAX(currentlevel) as max_level,
     COUNT(*) as events
 FROM playstats
-WHERE tournament_id = 1 
-  AND game_id = 1
-GROUP BY player_id
+WHERE tournamentid = 1 
+  AND gameid = 1
+GROUP BY playerid
 ORDER BY avg_score DESC
 LIMIT 100;
 
@@ -33,14 +33,14 @@ LIMIT 100;
 
 EXPLAIN ANALYZE
 SELECT 
-    DATE_TRUNC('day', stat_time) as day,
-    game_id,
-    COUNT(DISTINCT player_id) as dau,
-    SUM(current_play_time) as total_play_time,
-    AVG(current_score) as avg_score,
+    DATE_TRUNC('day', stattime) as day,
+    gameid,
+    COUNT(DISTINCT playerid) as dau,
+    SUM(currentplaytime) as total_play_time,
+    AVG(currentscore) as avg_score,
     COUNT(*) as total_events
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '30 days'
+WHERE stattime >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY 1, 2
 ORDER BY day DESC, dau DESC
 LIMIT 50;
@@ -53,16 +53,16 @@ LIMIT 50;
 
 EXPLAIN ANALYZE
 SELECT 
-    game_id,
-    AVG(current_score) as avg_score,
-    SUM(current_play_time) as total_time,
-    MAX(current_level) as max_level,
-    MIN(stat_time) as first_played,
-    MAX(stat_time) as last_played,
+    gameid,
+    AVG(currentscore) as avg_score,
+    SUM(currentplaytime) as total_time,
+    MAX(currentlevel) as max_level,
+    MIN(stattime) as first_played,
+    MAX(stattime) as last_played,
     COUNT(*) as total_sessions
 FROM playstats
-WHERE player_id = 42
-GROUP BY game_id
+WHERE playerid = 42
+GROUP BY gameid
 ORDER BY total_time DESC;
 
 -- =============================================================================
@@ -73,15 +73,15 @@ ORDER BY total_time DESC;
 
 EXPLAIN ANALYZE
 SELECT 
-    tournament_id,
-    game_id,
-    COUNT(DISTINCT player_id) as unique_players,
-    AVG(current_score) as avg_score,
-    MAX(current_score) as high_score,
-    SUM(current_play_time) as total_play_time,
+    tournamentid,
+    gameid,
+    COUNT(DISTINCT playerid) as unique_players,
+    AVG(currentscore) as avg_score,
+    MAX(currentscore) as high_score,
+    SUM(currentplaytime) as total_play_time,
     COUNT(*) as total_events
 FROM playstats
-GROUP BY tournament_id, game_id
+GROUP BY tournamentid, gameid
 ORDER BY total_events DESC
 LIMIT 50;
 

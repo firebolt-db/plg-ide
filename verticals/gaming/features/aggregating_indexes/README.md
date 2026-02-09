@@ -35,18 +35,18 @@ Show top players in a tournament, ranked by average score.
 
 ```sql
 SELECT 
-    player_id,
-    AVG(current_score) as avg_score,
-    SUM(current_play_time) as total_time,
-    MAX(current_level) as max_level
+    playerid,
+    AVG(currentscore) as avg_score,
+    SUM(currentplaytime) as total_time,
+    MAX(currentlevel) as max_level
 FROM playstats
-WHERE tournament_id = ? AND game_id = ?
-GROUP BY player_id
+WHERE tournamentid = ? AND gameid = ?
+GROUP BY playerid
 ORDER BY avg_score DESC
 LIMIT 100;
 ```
 
-**Index**: Groups by `tournament_id, game_id, player_id` with aggregations.
+**Index**: Groups by `tournamentid, gameid, playerid` with aggregations.
 
 ### 2. Daily Active Users (DAU)
 
@@ -54,17 +54,17 @@ Track daily player engagement trends.
 
 ```sql
 SELECT 
-    DATE_TRUNC('day', stat_time) as day,
-    game_id,
-    COUNT(DISTINCT player_id) as dau,
-    SUM(current_play_time) as total_play_time
+    DATE_TRUNC('day', stattime) as day,
+    gameid,
+    COUNT(DISTINCT playerid) as dau,
+    SUM(currentplaytime) as total_play_time
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '30 days'
+WHERE stattime >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY 1, 2
 ORDER BY day DESC, dau DESC;
 ```
 
-**Index**: Groups by `game_id, DATE_TRUNC('day', stat_time)` with aggregations.
+**Index**: Groups by `gameid, DATE_TRUNC('day', stattime)` with aggregations.
 
 ### 3. Player Profile Stats
 
@@ -72,18 +72,18 @@ Show a player's historical performance across games.
 
 ```sql
 SELECT 
-    game_id,
-    AVG(current_score) as avg_score,
-    SUM(current_play_time) as total_time,
-    MAX(current_level) as max_level,
+    gameid,
+    AVG(currentscore) as avg_score,
+    SUM(currentplaytime) as total_time,
+    MAX(currentlevel) as max_level,
     COUNT(*) as sessions
 FROM playstats
-WHERE player_id = ?
-GROUP BY game_id
+WHERE playerid = ?
+GROUP BY gameid
 ORDER BY total_time DESC;
 ```
 
-**Index**: Groups by `player_id, game_id` with aggregations.
+**Index**: Groups by `playerid, gameid` with aggregations.
 
 ## How It Works
 
@@ -91,7 +91,7 @@ ORDER BY total_time DESC;
 ┌─────────────────────────────────────────────────────────────────┐
 │                   BEFORE: Full Table Scan                        │
 │                                                                  │
-│  SELECT game_id, AVG(score) FROM playstats GROUP BY game_id     │
+│  SELECT gameid, AVG(currentscore) FROM playstats GROUP BY gameid     │
 │                                                                  │
 │  playstats (10M rows)                                            │
 │  ┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┐            │
@@ -104,11 +104,11 @@ ORDER BY total_time DESC;
 ┌─────────────────────────────────────────────────────────────────┐
 │                   AFTER: Index Lookup                            │
 │                                                                  │
-│  SELECT game_id, AVG(score) FROM playstats GROUP BY game_id     │
+│  SELECT gameid, AVG(currentscore) FROM playstats GROUP BY gameid     │
 │                                                                  │
 │  Aggregating Index (100 rows - one per game)                    │
 │  ┌──────────────────────────────────────────┐                   │
-│  │ game_id │ SUM(score) │ COUNT(*) │ ...    │                   │
+│  │ gameid │ SUM(currentscore) │ COUNT(*) │ ...    │                   │
 │  ├──────────────────────────────────────────┤                   │
 │  │    1    │  5000000   │  100000  │        │                   │
 │  │    2    │  4800000   │   95000  │        │                   │

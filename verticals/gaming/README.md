@@ -54,17 +54,18 @@ Demonstrates 50-100X query speedup for:
 
 ## Schema
 
+Aligned with [Firebolt.io Ultra Fast Gaming](https://www.firebolt.io/free-sample-datasets/ultra-fast-gaming) dataset:
+
 ```sql
 -- Core dimension tables
-players (player_id, username, email, created_at, subscription_type)
-games (game_id, game_name, genre, platform, release_date)
-tournaments (tournament_id, game_id, tournament_name, start_date, end_date)
+players (playerid, nickname, email, agecategory, platforms, registeredon, ...)
+games (gameid, title, category, launchdate, ...)
+tournaments (tournamentid, name, gameid, totalprizedollars, startdatetime, enddatetime, ...)
 
 -- High-volume fact table
 playstats (
-    stat_id, player_id, game_id, tournament_id,
-    stat_time, current_score, current_level, 
-    current_play_time, platform
+    gameid, playerid, tournamentid, stattime,
+    currentscore, currentlevel, currentplaytime, selectedcar, ...
 )
 ```
 

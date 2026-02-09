@@ -4,76 +4,76 @@
 -- =============================================================================
 -- INDEX 1: Leaderboard Aggregating Index
 -- Optimizes: Tournament leaderboard queries
--- Groups by: tournament_id, game_id, player_id
+-- Groups by: tournamentid, gameid, playerid
 -- =============================================================================
 
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
     -- Grouping columns (dimensions)
-    tournament_id,
-    game_id,
-    player_id,
+    tournamentid,
+    gameid,
+    playerid,
     -- Aggregation functions (measures)
-    AVG(current_score),
-    SUM(current_play_time),
-    MAX(current_level),
+    AVG(currentscore),
+    SUM(currentplaytime),
+    MAX(currentlevel),
     COUNT(*)
 );
 
 -- =============================================================================
 -- INDEX 2: Daily Metrics Aggregating Index
 -- Optimizes: DAU/MAU and daily analytics queries
--- Groups by: game_id, day (date truncated)
+-- Groups by: gameid, day (date truncated)
 -- =============================================================================
 
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_daily_agg
 ON playstats (
     -- Grouping columns
-    game_id,
-    DATE_TRUNC('day', stat_time),
+    gameid,
+    DATE_TRUNC('day', stattime),
     -- Aggregation functions
-    SUM(current_play_time),
-    AVG(current_score),
-    COUNT(DISTINCT player_id),
+    SUM(currentplaytime),
+    AVG(currentscore),
+    COUNT(DISTINCT playerid),
     COUNT(*)
 );
 
 -- =============================================================================
 -- INDEX 3: Player Statistics Aggregating Index
 -- Optimizes: Player profile and history queries
--- Groups by: player_id, game_id
+-- Groups by: playerid, gameid
 -- =============================================================================
 
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_player_agg
 ON playstats (
     -- Grouping columns
-    player_id,
-    game_id,
+    playerid,
+    gameid,
     -- Aggregation functions
-    AVG(current_score),
-    SUM(current_play_time),
-    MAX(current_level),
-    MIN(stat_time),
-    MAX(stat_time),
+    AVG(currentscore),
+    SUM(currentplaytime),
+    MAX(currentlevel),
+    MIN(stattime),
+    MAX(stattime),
     COUNT(*)
 );
 
 -- =============================================================================
 -- INDEX 4: Tournament Overview Aggregating Index
 -- Optimizes: Tournament summary and analytics queries
--- Groups by: tournament_id, game_id
+-- Groups by: tournamentid, gameid
 -- =============================================================================
 
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
     -- Grouping columns
-    tournament_id,
-    game_id,
+    tournamentid,
+    gameid,
     -- Aggregation functions
-    AVG(current_score),
-    MAX(current_score),
-    SUM(current_play_time),
-    COUNT(DISTINCT player_id),
+    AVG(currentscore),
+    MAX(currentscore),
+    SUM(currentplaytime),
+    COUNT(DISTINCT playerid),
     COUNT(*)
 );
 

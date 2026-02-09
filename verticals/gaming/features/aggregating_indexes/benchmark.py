@@ -20,14 +20,14 @@ QUERIES = {
         "description": "Top players in a tournament by score",
         "sql": """
             SELECT 
-                player_id,
-                AVG(current_score) as avg_score,
-                SUM(current_play_time) as total_time,
-                MAX(current_level) as max_level,
+                playerid,
+                AVG(currentscore) as avg_score,
+                SUM(currentplaytime) as total_time,
+                MAX(currentlevel) as max_level,
                 COUNT(*) as events
             FROM playstats
-            WHERE tournament_id = 1 AND game_id = 1
-            GROUP BY player_id
+            WHERE tournamentid = 1 AND gameid = 1
+            GROUP BY playerid
             ORDER BY avg_score DESC
             LIMIT 100
         """,
@@ -37,13 +37,13 @@ QUERIES = {
         "description": "DAU metrics for the last 30 days",
         "sql": """
             SELECT 
-                DATE_TRUNC('day', stat_time) as day,
-                game_id,
-                COUNT(DISTINCT player_id) as dau,
-                SUM(current_play_time) as total_play_time,
+                DATE_TRUNC('day', stattime) as day,
+                gameid,
+                COUNT(DISTINCT playerid) as dau,
+                SUM(currentplaytime) as total_play_time,
                 COUNT(*) as total_events
             FROM playstats
-            WHERE stat_time >= CURRENT_DATE - INTERVAL '30 days'
+            WHERE stattime >= CURRENT_DATE - INTERVAL '30 days'
             GROUP BY 1, 2
             ORDER BY day DESC, dau DESC
             LIMIT 50
@@ -54,14 +54,14 @@ QUERIES = {
         "description": "Player's performance across all games",
         "sql": """
             SELECT 
-                game_id,
-                AVG(current_score) as avg_score,
-                SUM(current_play_time) as total_time,
-                MAX(current_level) as max_level,
+                gameid,
+                AVG(currentscore) as avg_score,
+                SUM(currentplaytime) as total_time,
+                MAX(currentlevel) as max_level,
                 COUNT(*) as total_sessions
             FROM playstats
-            WHERE player_id = 42
-            GROUP BY game_id
+            WHERE playerid = 42
+            GROUP BY gameid
             ORDER BY total_time DESC
         """,
         "expected_improvement": "43X"
@@ -70,15 +70,15 @@ QUERIES = {
         "description": "Aggregate stats per tournament",
         "sql": """
             SELECT 
-                tournament_id,
-                game_id,
-                COUNT(DISTINCT player_id) as unique_players,
-                AVG(current_score) as avg_score,
-                MAX(current_score) as high_score,
-                SUM(current_play_time) as total_play_time,
+                tournamentid,
+                gameid,
+                COUNT(DISTINCT playerid) as unique_players,
+                AVG(currentscore) as avg_score,
+                MAX(currentscore) as high_score,
+                SUM(currentplaytime) as total_play_time,
                 COUNT(*) as total_events
             FROM playstats
-            GROUP BY tournament_id, game_id
+            GROUP BY tournamentid, gameid
             ORDER BY total_events DESC
             LIMIT 50
         """,
@@ -91,31 +91,31 @@ CREATE_INDEXES_SQL = """
 -- Leaderboard index
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
-    tournament_id, game_id, player_id,
-    AVG(current_score), SUM(current_play_time), MAX(current_level), COUNT(*)
+    tournamentid, gameid, playerid,
+    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel), COUNT(*)
 );
 
 -- Daily metrics index
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_daily_agg
 ON playstats (
-    game_id, DATE_TRUNC('day', stat_time),
-    SUM(current_play_time), AVG(current_score), COUNT(DISTINCT player_id), COUNT(*)
+    gameid, DATE_TRUNC('day', stattime),
+    SUM(currentplaytime), AVG(currentscore), COUNT(DISTINCT playerid), COUNT(*)
 );
 
 -- Player stats index
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_player_agg
 ON playstats (
-    player_id, game_id,
-    AVG(current_score), SUM(current_play_time), MAX(current_level),
-    MIN(stat_time), MAX(stat_time), COUNT(*)
+    playerid, gameid,
+    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel),
+    MIN(stattime), MAX(stattime), COUNT(*)
 );
 
 -- Tournament overview index
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
-    tournament_id, game_id,
-    AVG(current_score), MAX(current_score), SUM(current_play_time),
-    COUNT(DISTINCT player_id), COUNT(*)
+    tournamentid, gameid,
+    AVG(currentscore), MAX(currentscore), SUM(currentplaytime),
+    COUNT(DISTINCT playerid), COUNT(*)
 );
 """
 

@@ -1,41 +1,53 @@
 -- Gaming Vertical Schema
--- Ultra Fast Gaming Dataset Tables
+-- Aligned with Firebolt.io Ultra Fast Gaming dataset (firebolt.io UI)
 
 -- =============================================================================
 -- DIMENSION TABLES
 -- =============================================================================
 
 -- Players table - user accounts
-CREATE TABLE IF NOT EXISTS players (
-    player_id INT,
-    username TEXT,
-    email TEXT,
-    registration_date DATE,
-    subscription_type TEXT,  -- 'free', 'premium', 'pro'
-    country TEXT,
-    platform TEXT            -- 'pc', 'console', 'mobile'
-) PRIMARY INDEX player_id;
+CREATE DIMENSION TABLE IF NOT EXISTS players (
+    playerid INTEGER NULL,
+    nickname TEXT NULL,
+    email TEXT NULL,
+    agecategory TEXT NULL,
+    platforms ARRAY(TEXT NULL) NULL,
+    registeredon DATE NULL,
+    issubscribedtonewsletter BOOLEAN NULL,
+    internalprobabilitytowin DOUBLE PRECISION NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX agecategory, registeredon;
 
 -- Games table - game catalog
-CREATE TABLE IF NOT EXISTS games (
-    game_id INT,
-    game_name TEXT,
-    genre TEXT,
-    publisher TEXT,
-    release_date DATE,
-    rating REAL
-) PRIMARY INDEX game_id;
+CREATE DIMENSION TABLE IF NOT EXISTS games (
+    gameid INTEGER NULL,
+    title TEXT NULL,
+    abbreviation TEXT NULL,
+    series TEXT NULL,
+    version NUMERIC(10, 2) NULL,
+    gamedescription TEXT NULL,
+    category TEXT NULL,
+    launchdate DATE NULL,
+    author TEXT NULL,
+    supportedplatforms ARRAY(TEXT NULL) NULL,
+    gameconfiguration TEXT NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX gameid, title;
 
 -- Tournaments table - competitive events
-CREATE TABLE IF NOT EXISTS tournaments (
-    tournament_id INT,
-    game_id INT,
-    tournament_name TEXT,
-    start_date TIMESTAMP,
-    end_date TIMESTAMP,
-    prize_pool DECIMAL(12, 2),
-    status TEXT              -- 'upcoming', 'active', 'completed'
-) PRIMARY INDEX tournament_id;
+CREATE DIMENSION TABLE IF NOT EXISTS tournaments (
+    tournamentid INTEGER NULL,
+    name TEXT NULL,
+    gameid INTEGER NULL,
+    totalprizedollars INTEGER NULL,
+    startdatetime TIMESTAMP NULL,
+    enddatetime TIMESTAMP NULL,
+    rulesdefinition TEXT NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX tournamentid;
 
 -- =============================================================================
 -- FACT TABLE (HIGH VOLUME)
@@ -44,17 +56,20 @@ CREATE TABLE IF NOT EXISTS tournaments (
 -- PlayStats table - game play events (the star of the show)
 -- This is where aggregating indexes provide massive value
 CREATE TABLE IF NOT EXISTS playstats (
-    stat_id BIGINT,
-    player_id INT,
-    game_id INT,
-    tournament_id INT,
-    stat_time TIMESTAMP,
-    current_score INT,
-    current_level INT,
-    current_play_time INT,   -- seconds
-    platform TEXT,
-    session_id TEXT
-) PRIMARY INDEX stat_id;
+    gameid INTEGER NULL,
+    playerid INTEGER NULL,
+    stattime TIMESTAMP NULL,
+    selectedcar TEXT NULL,
+    currentlevel INTEGER NULL,
+    currentspeed REAL NULL,
+    currentplaytime BIGINT NULL,
+    currentscore BIGINT NULL,
+    event TEXT NULL,
+    errorcode TEXT NULL,
+    tournamentid INTEGER NULL,
+    source_file_name TEXT NULL,
+    source_file_timestamp TIMESTAMP NULL
+) PRIMARY INDEX tournamentid, gameid, playerid, stattime;
 
 -- =============================================================================
 -- VERIFICATION

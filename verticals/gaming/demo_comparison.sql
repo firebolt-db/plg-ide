@@ -51,14 +51,14 @@ DROP AGGREGATING INDEX IF EXISTS playstats_leaderboard_agg;
 SELECT 'LEADERBOARD - WITHOUT INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    player_id,
-    AVG(current_score) AS avg_score,
-    SUM(current_play_time) AS total_time,
-    MAX(current_level) AS max_level,
+    playerid,
+    AVG(currentscore) AS avg_score,
+    SUM(currentplaytime) AS total_time,
+    MAX(currentlevel) AS max_level,
     COUNT(*) AS events
 FROM playstats
-WHERE tournament_id = 1 AND game_id = 1
-GROUP BY player_id
+WHERE tournamentid = 1 AND gameid = 1
+GROUP BY playerid
 ORDER BY avg_score DESC
 LIMIT 10;
 
@@ -67,21 +67,21 @@ LIMIT 10;
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_leaderboard_agg
 ON playstats (
-    tournament_id, game_id, player_id,
-    AVG(current_score), SUM(current_play_time), MAX(current_level), COUNT(*)
+    tournamentid, gameid, playerid,
+    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel), COUNT(*)
 );
 
 SELECT 'LEADERBOARD - WITH INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    player_id,
-    AVG(current_score) AS avg_score,
-    SUM(current_play_time) AS total_time,
-    MAX(current_level) AS max_level,
+    playerid,
+    AVG(currentscore) AS avg_score,
+    SUM(currentplaytime) AS total_time,
+    MAX(currentlevel) AS max_level,
     COUNT(*) AS events
 FROM playstats
-WHERE tournament_id = 1 AND game_id = 1
-GROUP BY player_id
+WHERE tournamentid = 1 AND gameid = 1
+GROUP BY playerid
 ORDER BY avg_score DESC
 LIMIT 10;
 
@@ -98,13 +98,13 @@ DROP AGGREGATING INDEX IF EXISTS playstats_daily_agg;
 SELECT 'DAU METRICS - WITHOUT INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    DATE_TRUNC('day', stat_time) AS day,
-    game_id,
-    COUNT(DISTINCT player_id) AS dau,
-    SUM(current_play_time) AS total_time,
+    DATE_TRUNC('day', stattime) AS day,
+    gameid,
+    COUNT(DISTINCT playerid) AS dau,
+    SUM(currentplaytime) AS total_time,
     COUNT(*) AS events
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '7 days'
+WHERE stattime >= CURRENT_DATE - INTERVAL '7 days'
 GROUP BY 1, 2
 ORDER BY day DESC, dau DESC
 LIMIT 20;
@@ -114,20 +114,20 @@ LIMIT 20;
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_daily_agg
 ON playstats (
-    game_id, DATE_TRUNC('day', stat_time),
-    SUM(current_play_time), AVG(current_score), COUNT(DISTINCT player_id), COUNT(*)
+    gameid, DATE_TRUNC('day', stattime),
+    SUM(currentplaytime), AVG(currentscore), COUNT(DISTINCT playerid), COUNT(*)
 );
 
 SELECT 'DAU METRICS - WITH INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    DATE_TRUNC('day', stat_time) AS day,
-    game_id,
-    COUNT(DISTINCT player_id) AS dau,
-    SUM(current_play_time) AS total_time,
+    DATE_TRUNC('day', stattime) AS day,
+    gameid,
+    COUNT(DISTINCT playerid) AS dau,
+    SUM(currentplaytime) AS total_time,
     COUNT(*) AS events
 FROM playstats
-WHERE stat_time >= CURRENT_DATE - INTERVAL '7 days'
+WHERE stattime >= CURRENT_DATE - INTERVAL '7 days'
 GROUP BY 1, 2
 ORDER BY day DESC, dau DESC
 LIMIT 20;
@@ -145,16 +145,16 @@ DROP AGGREGATING INDEX IF EXISTS playstats_player_agg;
 SELECT 'PLAYER PROFILE - WITHOUT INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    game_id,
-    AVG(current_score) AS avg_score,
-    SUM(current_play_time) AS total_time,
-    MAX(current_level) AS max_level,
-    MIN(stat_time) AS first_played,
-    MAX(stat_time) AS last_played,
+    gameid,
+    AVG(currentscore) AS avg_score,
+    SUM(currentplaytime) AS total_time,
+    MAX(currentlevel) AS max_level,
+    MIN(stattime) AS first_played,
+    MAX(stattime) AS last_played,
     COUNT(*) AS sessions
 FROM playstats
-WHERE player_id = 42
-GROUP BY game_id
+WHERE playerid = 42
+GROUP BY gameid
 ORDER BY total_time DESC;
 
 -- -----------------------------------------------------------------------------
@@ -162,24 +162,24 @@ ORDER BY total_time DESC;
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_player_agg
 ON playstats (
-    player_id, game_id,
-    AVG(current_score), SUM(current_play_time), MAX(current_level),
-    MIN(stat_time), MAX(stat_time), COUNT(*)
+    playerid, gameid,
+    AVG(currentscore), SUM(currentplaytime), MAX(currentlevel),
+    MIN(stattime), MAX(stattime), COUNT(*)
 );
 
 SELECT 'PLAYER PROFILE - WITH INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    game_id,
-    AVG(current_score) AS avg_score,
-    SUM(current_play_time) AS total_time,
-    MAX(current_level) AS max_level,
-    MIN(stat_time) AS first_played,
-    MAX(stat_time) AS last_played,
+    gameid,
+    AVG(currentscore) AS avg_score,
+    SUM(currentplaytime) AS total_time,
+    MAX(currentlevel) AS max_level,
+    MIN(stattime) AS first_played,
+    MAX(stattime) AS last_played,
     COUNT(*) AS sessions
 FROM playstats
-WHERE player_id = 42
-GROUP BY game_id
+WHERE playerid = 42
+GROUP BY gameid
 ORDER BY total_time DESC;
 
 
@@ -195,14 +195,14 @@ DROP AGGREGATING INDEX IF EXISTS playstats_tournament_agg;
 SELECT 'TOURNAMENT OVERVIEW - WITHOUT INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    tournament_id,
-    COUNT(DISTINCT player_id) AS unique_players,
-    AVG(current_score) AS avg_score,
-    MAX(current_score) AS high_score,
-    SUM(current_play_time) AS total_time,
+    tournamentid,
+    COUNT(DISTINCT playerid) AS unique_players,
+    AVG(currentscore) AS avg_score,
+    MAX(currentscore) AS high_score,
+    SUM(currentplaytime) AS total_time,
     COUNT(*) AS events
 FROM playstats
-GROUP BY tournament_id
+GROUP BY tournamentid
 ORDER BY events DESC
 LIMIT 20;
 
@@ -211,22 +211,22 @@ LIMIT 20;
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
-    tournament_id,
-    AVG(current_score), MAX(current_score), SUM(current_play_time),
-    COUNT(DISTINCT player_id), COUNT(*)
+    tournamentid,
+    AVG(currentscore), MAX(currentscore), SUM(currentplaytime),
+    COUNT(DISTINCT playerid), COUNT(*)
 );
 
 SELECT 'TOURNAMENT OVERVIEW - WITH INDEX' AS test_name, NOW() AS started_at;
 
 SELECT 
-    tournament_id,
-    COUNT(DISTINCT player_id) AS unique_players,
-    AVG(current_score) AS avg_score,
-    MAX(current_score) AS high_score,
-    SUM(current_play_time) AS total_time,
+    tournamentid,
+    COUNT(DISTINCT playerid) AS unique_players,
+    AVG(currentscore) AS avg_score,
+    MAX(currentscore) AS high_score,
+    SUM(currentplaytime) AS total_time,
     COUNT(*) AS events
 FROM playstats
-GROUP BY tournament_id
+GROUP BY tournamentid
 ORDER BY events DESC
 LIMIT 20;
 
@@ -255,8 +255,8 @@ TRUNCATE TABLE benchmark_results;
 
 -- Ensure indexes are in place for fair testing
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
-ON playstats (tournament_id, AVG(current_score), MAX(current_score), 
-              SUM(current_play_time), COUNT(DISTINCT player_id), COUNT(*));
+ON playstats (tournamentid, AVG(currentscore), MAX(currentscore), 
+              SUM(currentplaytime), COUNT(DISTINCT playerid), COUNT(*));
 
 -- Quick performance check (you can capture EXPLAIN ANALYZE timing manually)
 SELECT 
@@ -302,44 +302,43 @@ UNION ALL SELECT
 
 -- Top 10 most active players (total play time)
 SELECT 
-    p.username,
-    p.country,
-    p.subscription_type,
-    SUM(ps.current_play_time) / 3600.0 AS total_hours_played,
-    COUNT(DISTINCT ps.game_id) AS games_played,
-    MAX(ps.current_level) AS highest_level
+    p.nickname,
+    p.agecategory,
+    p.issubscribedtonewsletter,
+    SUM(ps.currentplaytime) / 3600.0 AS total_hours_played,
+    COUNT(DISTINCT ps.gameid) AS games_played,
+    MAX(ps.currentlevel) AS highest_level
 FROM playstats ps
-JOIN players p ON ps.player_id = p.player_id
-GROUP BY p.player_id, p.username, p.country, p.subscription_type
+JOIN players p ON ps.playerid = p.playerid
+GROUP BY p.playerid, p.nickname, p.agecategory, p.issubscribedtonewsletter
 ORDER BY total_hours_played DESC
 LIMIT 10;
 
--- Game popularity by platform
+-- Game popularity by selected car (proxy for platform in Firebolt.io schema)
 SELECT 
-    g.game_name,
-    g.genre,
-    ps.platform,
-    COUNT(DISTINCT ps.player_id) AS unique_players,
-    SUM(ps.current_play_time) / 3600.0 AS total_hours,
-    AVG(ps.current_score) AS avg_score
+    g.title,
+    g.category,
+    ps.selectedcar,
+    COUNT(DISTINCT ps.playerid) AS unique_players,
+    SUM(ps.currentplaytime) / 3600.0 AS total_hours,
+    AVG(ps.currentscore) AS avg_score
 FROM playstats ps
-JOIN games g ON ps.game_id = g.game_id
-GROUP BY g.game_id, g.game_name, g.genre, ps.platform
+JOIN games g ON ps.gameid = g.gameid
+GROUP BY g.gameid, g.title, g.category, ps.selectedcar
 ORDER BY unique_players DESC
 LIMIT 20;
 
 -- Tournament prize pool vs engagement
 SELECT 
-    t.tournament_name,
-    t.prize_pool,
-    COUNT(DISTINCT ps.player_id) AS participants,
-    SUM(ps.current_play_time) / 3600.0 AS total_hours,
-    t.prize_pool / NULLIF(COUNT(DISTINCT ps.player_id), 0) AS prize_per_player
+    t.name,
+    t.totalprizedollars,
+    COUNT(DISTINCT ps.playerid) AS participants,
+    SUM(ps.currentplaytime) / 3600.0 AS total_hours,
+    t.totalprizedollars / NULLIF(COUNT(DISTINCT ps.playerid), 0) AS prize_per_player
 FROM tournaments t
-JOIN playstats ps ON t.tournament_id = ps.tournament_id
-WHERE t.status = 'completed'
-GROUP BY t.tournament_id, t.tournament_name, t.prize_pool
-ORDER BY prize_pool DESC
+JOIN playstats ps ON t.tournamentid = ps.tournamentid
+GROUP BY t.tournamentid, t.name, t.totalprizedollars
+ORDER BY totalprizedollars DESC
 LIMIT 10;
 
 
