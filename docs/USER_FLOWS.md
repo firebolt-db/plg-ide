@@ -1,6 +1,6 @@
-# PLG-IDE User Flows
+# plg-ide User Flows
 
-> Step-by-step user journeys for the PLG-IDE web application
+> Step-by-step user journeys for the plg-ide web application
 
 ## Flow 1: First-Time Setup
 
@@ -46,6 +46,47 @@
 - Connection failed: Show error message with troubleshooting tips
 - Invalid credentials: Highlight which field is wrong
 - Timeout: Offer retry button
+
+---
+
+## Flow 1b: New User Without Cloud Login
+
+**Goal:** Get a new user (no Firebolt Cloud account) into a working demo quickly
+
+**Persona:** New user via the IDE experience; no Cloud credentials
+
+**Scenario:** User lands on runtime selection and doesn’t have (or doesn’t want to use) Firebolt Cloud login.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. Land on Home Page                                   │
+│     └─ See "Step 1: Select Your Runtime"                │
+│     └─ Two options: Firebolt Core | Firebolt Cloud     │
+│                                                         │
+│  2. Preferred path (no Cloud login)                     │
+│     ├─ UI should make Core the obvious "try first" path │
+│     │   (e.g. "No account? Start with Core (free)")    │
+│     └─ User selects "Firebolt Core"                    │
+│                                                         │
+│  3. Setup Wizard (Core)                                 │
+│     ├─ Step 1: Confirm runtime = Core                  │
+│     ├─ Step 2: Host (default localhost:3473)            │
+│     ├─ Step 3: Test connection                         │
+│     │   └─ If Core not running: show "Start Core" help  │
+│     └─ Step 4: Database setup → Continue                │
+│                                                         │
+│  4. User reaches Vertical Selection and can run demos   │
+└─────────────────────────────────────────────────────────┘
+```
+
+**If user selects Cloud but has no credentials:**
+- On Setup Step 2 (Cloud credentials): show short copy e.g. "Don’t have Cloud credentials? Use Firebolt Core to try demos locally (free)."
+- After "Test Connection" fails (invalid/missing credentials): error message should include a clear action: "Switch to Firebolt Core" (or link back to home to choose Core).
+- Do not leave the user stuck with no path forward.
+
+**Success Criteria:**
+- New users can complete a demo without Cloud login by using Core.
+- If they choose Cloud and fail, they are offered a path to Core (or to get credentials), not a dead end.
 
 ---
 

@@ -1,10 +1,12 @@
-# PLG-IDE Knowledge
+# plg-ide Knowledge
 
 > This file provides context for AI-assisted development (Loveable, Cursor, etc.)
+>
+> **For Loveable:** Use this file as the primary context for product vision and design system. Build entry point: **docs/LOVEABLE.md**. Data for verticals/features: **docs/app-manifest.json**.
 
 ## Product Vision
 
-PLG-IDE is a **Product-Led Growth platform for Firebolt** that demonstrates the value of Firebolt's data warehouse through interactive, measurable demos. It serves three purposes:
+plg-ide is a **Product-Led Growth platform for Firebolt** that demonstrates the value of Firebolt's data warehouse through interactive, measurable demos. It serves three purposes:
 
 1. **IDE Getting Started** - Developers open this repo in Cursor and experience Firebolt's value firsthand
 2. **Sales Training** - Sales Engineers and Partners learn Firebolt features through hands-on demos
@@ -228,20 +230,28 @@ Use these prompts to build the app incrementally:
 ## File Structure Reference
 
 ```
-PLG-IDE/
-├── KNOWLEDGE.md          # This file
+plg-ide/
+├── KNOWLEDGE.md          # This file (vision, design, features)
 ├── README.md             # Getting started guide
-├── ROADMAP.md            # Feature roadmap
+├── ROADMAP.md            # Feature roadmap, Loveable build phases
 ├── config/               # MCP and environment configs
 ├── lib/                  # Python runtime abstraction
 ├── verticals/            # Industry-specific demos
-│   └── gaming/
+│   ├── gaming/           # Leaderboards, player analytics
+│   ├── ecommerce/        # Retail, revenue, product analytics
+│   ├── adtech/           # Campaigns, impressions, publishers
+│   ├── observability/    # Logs, metrics, tracing
+│   └── financial/        # Transactions, risk, reporting
 │       ├── schema/       # Table definitions (SQL)
 │       ├── data/         # Data loading (SQL/Python)
-│       └── features/     # Feature demos
+│       ├── demo_full.sql # Full walkthrough + talking points
+│       ├── demo_comparison.sql
+│       └── features/     # Feature demos (e.g. aggregating_indexes)
 ├── features/             # Cross-vertical feature docs
 └── docs/                 # Additional documentation
+    ├── LOVEABLE.md       # Loveable build entry point
     ├── APP_SPEC.md       # UI specification
     ├── DATA_CONTRACTS.md # TypeScript interfaces
-    └── USER_FLOWS.md     # User journey maps
+    ├── USER_FLOWS.md     # User journey maps
+    └── app-manifest.json # Verticals + features (data for app)
 ```

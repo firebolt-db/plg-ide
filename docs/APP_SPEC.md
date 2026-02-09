@@ -1,6 +1,8 @@
-# PLG-IDE App Specification
+# plg-ide App Specification
 
-> UI specification for the PLG-IDE web application (Loveable build target)
+> UI specification for the plg-ide web application (Loveable build target)
+>
+> **For Loveable:** Use `docs/app-manifest.json` for the list of verticals and their features (Gaming, E-commerce, AdTech, Observability, Financial). Use `docs/LOVEABLE.md` as the build entry point.
 
 ## Page Structure
 
@@ -26,7 +28,7 @@
 │  [Firebolt Logo]                    [Settings] [Help]   │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│     Welcome to Firebolt PLG-IDE                         │
+│     Welcome to Firebolt plg-ide                         │
 │     Experience the value through interactive demos      │
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
@@ -40,9 +42,9 @@
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │  Step 2: Choose Your Vertical                    │   │
-│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐   │   │
-│  │  │ Gaming │ │E-comm  │ │ AdTech │ │Observe │   │   │
-│  │  └────────┘ └────────┘ └────────┘ └────────┘   │   │
+│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐   │
+│  │  │ Gaming │ │E-comm  │ │ AdTech │ │Observe │ │Financial│   │
+│  │  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
@@ -57,6 +59,8 @@
 - No runtime selected (initial)
 - Runtime selected, not connected
 - Runtime connected, ready
+
+**New user without Cloud login:** Prefer Firebolt Core as the default or highlighted "try first" option (e.g. label or helper text: "No account? Start with Core (free, local)."). When the user selects Cloud and later fails connection due to missing/invalid credentials, show an escape path: e.g. "Don't have Cloud credentials? Use Firebolt Core to run demos locally" with a control to switch to Core or return to runtime selection. Never leave the user with no path forward.
 
 ### 2. Setup Wizard (`/setup`)
 
@@ -180,6 +184,12 @@
 - Baseline complete
 - Running optimized
 - Both complete (show comparison)
+
+**Demo content source (for all features including Partitioning):**  
+For each `vertical` and `feature` in the app manifest, the backend/API should serve baseline and optimized SQL from this repo at:
+- Baseline: `verticals/{vertical}/features/{feature}/01_baseline.sql`
+- Optimized: `verticals/{vertical}/features/{feature}/03_optimized.sql`  
+The Feature Demo Runner must always show **both** Baseline and Optimized cards with SQL viewer and Run buttons, and load this content by vertical+feature (e.g. `ecommerce` + `partitioning`). If a feature has no demo files, show "Demo content coming soon" instead of empty inputs.
 
 ### 5. SQL Playground (`/playground`)
 

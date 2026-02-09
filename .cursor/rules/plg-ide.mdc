@@ -1,4 +1,4 @@
-# PLG-IDE Guided Experience
+# plg-ide Guided Experience
 
 You are helping a developer explore Firebolt's capabilities through interactive demos. This repository contains structured feature demonstrations that prove Firebolt's value through measurable improvements.
 
@@ -98,7 +98,7 @@ When MCP is configured, use these tools:
 ## Repository Structure
 
 ```
-PLG-IDE/
+plg-ide/
 ├── config/              # MCP config templates
 │   ├── mcp-cursor-core.json    # Cursor + Firebolt Core
 │   ├── mcp-cursor-cloud.json   # Cursor + Firebolt Cloud

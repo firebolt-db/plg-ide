@@ -1,4 +1,4 @@
-# PLG-IDE Roadmap
+# plg-ide Roadmap
 
 This document tracks the verticals and features to be developed, mapped to Firebolt's sample datasets and customer case studies.
 
@@ -6,7 +6,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              PLG-IDE Matrix                                  │
+│                              plg-ide Matrix                                  │
 ├─────────────────┬───────────────────────────────────────────────────────────┤
 │                 │                     FEATURES                               │
 │    VERTICALS    ├───────────┬─────────────┬────────────┬───────────┬────────┤
@@ -14,10 +14,10 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 │                 │           │             │ Search     │ Concur    │ Ingest │
 ├─────────────────┼───────────┼─────────────┼────────────┼───────────┼────────┤
 │ Gaming          │    ✓      │             │            │           │        │
-│ E-commerce      │           │             │            │           │        │
-│ AdTech          │           │             │            │           │        │
-│ Observability   │           │             │            │           │        │
-│ Financial       │           │             │            │           │        │
+│ E-commerce      │    ✓      │             │            │           │        │
+│ AdTech          │    ✓      │             │            │           │        │
+│ Observability   │    ✓      │             │            │           │        │
+│ Financial       │    ✓      │             │            │           │        │
 └─────────────────┴───────────┴─────────────┴────────────┴───────────┴────────┘
 ```
 
@@ -41,7 +41,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 
 ---
 
-### 🔲 E-commerce (NEXT)
+### ✅ E-commerce (DONE)
 
 **Dataset**: E-commerce (52GB, 412M rows)  
 **Case Studies**: Vrio (query perf + cost reduction)
@@ -53,11 +53,11 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 | Inventory Queries | Stock levels, joins | Primary Indexes |
 | Recommendation Engine | Similarity search | Vector Search |
 
-**Priority**: HIGH - Large dataset, common use case, proves scale.
+**Status**: Schema, data loading, aggregating indexes demo, demo_full, demo_comparison complete.
 
 ---
 
-### 🔲 AdTech
+### ✅ AdTech (DONE)
 
 **Dataset**: Custom (based on Similarweb/Bigabid patterns)  
 **Case Studies**: Similarweb (100 QPS, 1PB), Bigabid (400X faster, 77% storage savings)
@@ -69,11 +69,11 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 | Attribution | Multi-touch joins | Late Materialization |
 | Audience Segments | User behavior patterns | Vector Search |
 
-**Priority**: HIGH - Flagship customer vertical, high QPS showcase.
+**Status**: Schema, data loading, aggregating indexes demo, demo_full, demo_comparison complete.
 
 ---
 
-### 🔲 Observability / Logs
+### ✅ Observability / Logs (DONE)
 
 **Dataset**: Custom (based on TLDCRM pattern)  
 **Case Studies**: TLDCRM (replaced DataDog, 8M requests/day)
@@ -85,11 +85,11 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 | Trace Analysis | Distributed tracing joins | Late Materialization |
 | Anomaly Detection | Pattern matching | Vector Search |
 
-**Priority**: MEDIUM - Growing use case, DataDog replacement narrative.
+**Status**: Schema, data loading, aggregating indexes demo, demo_full, demo_comparison complete.
 
 ---
 
-### 🔲 Financial Services
+### ✅ Financial Services (DONE)
 
 **Dataset**: Custom or NYC datasets  
 **Case Studies**: Primer (millisecond latency), Ezora (30X faster)
@@ -101,7 +101,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 | Fraud Detection | Pattern matching | Vector Search |
 | Regulatory Reporting | Point-in-time queries | Time Travel |
 
-**Priority**: MEDIUM - High-value vertical, compliance requirements.
+**Status**: Schema, data loading, aggregating indexes demo, demo_full, demo_comparison complete.
 
 ---
 
@@ -361,8 +361,10 @@ For each comparison demo:
 - [x] Aggregating indexes demo
 
 ### Phase 2: Expand Verticals
-- [ ] E-commerce vertical (52GB dataset)
-- [ ] AdTech vertical (custom dataset)
+- [x] E-commerce vertical (schema, data, aggregating indexes demo)
+- [x] AdTech vertical (schema, data, aggregating indexes demo)
+- [x] Observability vertical (schema, data, aggregating indexes demo)
+- [x] Financial vertical (schema, data, aggregating indexes demo)
 - [ ] Late materialization demos
 
 ### Phase 3: Advanced Features

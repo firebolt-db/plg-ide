@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
-# PLG-IDE: Test Setup Script
+# plg-ide: Test Setup Script
 # =============================================================================
-# This script helps you verify your environment is ready for the PLG-IDE demos.
+# This script helps you verify your environment is ready for the plg-ide demos.
 # It will guide you through selecting your runtime and connection method.
 # =============================================================================
 
@@ -28,7 +28,7 @@ echo "║   ██╔══╝  ██║██╔══██╗██╔══
 echo "║   ██║     ██║██║  ██║███████╗██████╔╝╚██████╔╝███████╗██║                ║"
 echo "║   ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝╚═════╝  ╚═════╝ ╚══════╝╚═╝                ║"
 echo "║                                                                           ║"
-echo "║                     PLG-IDE Test Setup                                    ║"
+echo "║                     plg-ide Test Setup                                    ║"
 echo "║                                                                           ║"
 echo "╚═══════════════════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
@@ -268,7 +268,7 @@ if [ "$RUNTIME" = "cloud" ]; then
             echo -e "    2. Manually create a ${BOLD}.env${NC} file with:"
             echo ""
             echo -e "       ${BOLD}FIREBOLT_CLIENT_ID${NC}=your-client-id"
-            echo -e "       ${BOLD}FIREBOLT_CLIENT_SECRET${NC}=your-client-secret"
+            echo -e "       ${BOLD}FIREBOLT_CLIENT_SECRET${NC}=your-secret"
             echo -e "       ${BOLD}FIREBOLT_ACCOUNT${NC}=your-account-name"
             echo -e "       ${BOLD}FIREBOLT_ENGINE${NC}=your-engine-name"
             echo -e "       ${BOLD}FIREBOLT_DATABASE${NC}=ultrafast"
@@ -385,7 +385,7 @@ if [ "$CONNECTION" = "direct" ]; then
     else
         echo "  # Set environment variables"
         echo "  export FIREBOLT_CLIENT_ID='your-client-id'"
-        echo "  export FIREBOLT_CLIENT_SECRET='your-client-secret'"
+        echo "  export FIREBOLT_CLIENT_SECRET='your-secret'"
         echo ""
         echo "  # Run the demo"
         echo "  python verticals/gaming/features/aggregating_indexes/benchmark.py"

@@ -1,4 +1,4 @@
-# PLG-IDE: Firebolt Developer Experience
+# plg-ide: Firebolt Developer Experience
 
 > **⚠️ DRAFT - Early Development**
 > 
@@ -9,36 +9,31 @@ Experience Firebolt's value through interactive, feature-by-feature demonstratio
 
 ## Quick Start
 
-### 1. Install Prerequisites
+### 1. Add Firebolt MCP to Cursor (one click)
+
+**Firebolt Core (local, no account):** Use the button below. You’ll need [Docker](https://docs.docker.com/get-docker/) and [Firebolt Core](https://docs.firebolt.io/core/) running (e.g. `docker run -d -p 3473:3473 ghcr.io/firebolt-db/firebolt-core:latest`).
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=Firebolt%20MCP%20%28Core%29&config=eyJjb21tYW5kIjoiZG9ja2VyIiwiYXJncyI6WyJydW4iLCItaSIsIi0tcm0iLCItLW5ldHdvcmsiLCJob3N0IiwiLWUiLCJGSVJFQk9MVF9NQ1BfQ09SRV9VUkwiLCItZSIsIkZJUkVCT0xUX01DUF9ESVNBQkxFX1JFU09VUkNFUz10cnVlIiwiZ2hjci5pby9maXJlYm9sdC1kYi9tY3Atc2VydmVyOjAuNi4wIl0sImVudiI6eyJGSVJFQk9MVF9NQ1BfQ09SRV9VUkwiOiJodHRwOi8vbG9jYWxob3N0OjM0NzMiLCJGSVJFQk9MVF9NQ1BfRElTQUJMRV9SRVNPVVJDRVMiOiJ0cnVlIn19)
+
+**Firebolt Cloud:** Install via the button above, then in Cursor go to **Settings → Tools & MCP → New MCP Server** and add your `FIREBOLT_MCP_CLIENT_ID` and `FIREBOLT_MCP_CLIENT_SECRET` to the server’s env (or use the config in [config/mcp-cursor-cloud.json](config/mcp-cursor-cloud.json)).
+
+### 2. Pull Docker images (optional, for MCP + Core)
 
 ```bash
 ./setup.sh
 ```
 
-This pulls the required Docker images (Firebolt Core and MCP Server).
-
-### 2. Open in Cursor
-
-Open this repo in Cursor and ask:
+### 3. Open this repo in Cursor and ask
 
 > "Help me get started with Firebolt"
 
-The AI will guide you through:
-
-1. **Selecting your runtime** - Firebolt Core (local, free) or Firebolt Cloud
-2. **Configuring MCP** - Connects Cursor directly to Firebolt
-3. **Running demos** - Interactive proof-of-value demonstrations
-
-### What Happens Next
-
-Once configured, you can interact with Firebolt naturally:
+You’ll be guided to pick a runtime (Core or Cloud), then run demos. Example prompts:
 
 - "Create the gaming demo tables"
 - "Show me how aggregating indexes improve query performance"
 - "Run a leaderboard query and explain the results"
-- "How do I optimize this query?"
 
-The AI uses the [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) to execute queries and search documentation in real-time.
+The AI uses the [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) to run queries and search docs in real time.
 
 ## What's Inside
 
@@ -49,8 +44,10 @@ Industry-specific demos with real datasets:
 | Vertical | Dataset | Size | Description |
 |----------|---------|------|-------------|
 | [Gaming](verticals/gaming/) | Ultra Fast Gaming | ~1GB | Real-time leaderboards, player analytics |
-| E-commerce | Coming Soon | 52GB | Retail analytics, customer behavior |
-| AdTech | Coming Soon | - | High QPS, auction analytics |
+| [E-commerce](verticals/ecommerce/) | E-commerce | 52GB | Retail analytics, customer behavior, product recommendations |
+| [AdTech](verticals/adtech/) | AdTech | Custom | High QPS, campaign analytics, real-time bidding |
+| [Observability](verticals/observability/) | Observability | Custom | Log analytics, metrics aggregation, distributed tracing |
+| [Financial](verticals/financial/) | Financial Services | Custom | Transaction analytics, risk scoring, regulatory reporting |
 
 ### Features
 
@@ -87,62 +84,28 @@ Feature: Aggregating Indexes on playstats_leaderboard
 
 ## IDE Integration
 
-### Firebolt MCP Server
-
-The [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) is the recommended way to interact with Firebolt from your IDE. It provides:
+The [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) gives your IDE direct access to Firebolt:
 
 | Tool | Description |
 |------|-------------|
-| `firebolt_connect` | Connect to Firebolt databases and engines |
-| `firebolt_query` | Execute SQL queries directly |
-| `firebolt_docs_search` | Search Firebolt documentation |
-| `firebolt_docs_overview` | Get documentation overview |
+| `firebolt_connect` | Connect to databases and engines |
+| `firebolt_query` | Execute SQL |
+| `firebolt_docs_search` | Search Firebolt docs |
+| `firebolt_docs_overview` | Documentation overview |
 
-### Setup for Different IDEs
+### Setup by client
 
-**Cursor** (copy from `config/mcp-cursor-core.json`):
-```json
-{
-  "mcpServers": {
-    "firebolt": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "--network", "host",
-               "-e", "FIREBOLT_MCP_CORE_URL",
-               "-e", "FIREBOLT_MCP_DISABLE_RESOURCES=true",
-               "ghcr.io/firebolt-db/mcp-server:0.6.0"],
-      "env": { "FIREBOLT_MCP_CORE_URL": "http://localhost:3473" }
-    }
-  }
-}
-```
+| Client | Setup |
+|--------|--------|
+| **Cursor** | Use the [Add to Cursor](#1-add-firebolt-mcp-to-cursor-one-click) button above (Core), or copy [config/mcp-cursor-core.json](config/mcp-cursor-core.json) / [config/mcp-cursor-cloud.json](config/mcp-cursor-cloud.json). Set env in **Settings → Tools & MCP**. |
+| **Claude Desktop** | Copy [config/mcp-claude-desktop.json](config/mcp-claude-desktop.json) into your MCP config; set `FIREBOLT_MCP_CORE_URL` (and Cloud credentials if needed). |
 
-**Claude Desktop** (copy from `config/mcp-claude-desktop.json`):
-```json
-{
-  "mcpServers": {
-    "firebolt": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "--network", "host",
-               "-e", "FIREBOLT_MCP_CORE_URL",
-               "ghcr.io/firebolt-db/mcp-server:0.6.0"],
-      "env": { "FIREBOLT_MCP_CORE_URL": "http://localhost:3473" }
-    }
-  }
-}
-```
-
-### Guided Experience
-
-This repo includes Cursor rules that guide you through demos:
-
-1. Open in Cursor with MCP configured
-2. Ask: "Show me the gaming demo" or "How do aggregating indexes work?"
-3. The AI will use MCP tools to connect, run queries, and explain results
+Full step-by-step: [docs/MCP_SETUP.md](docs/MCP_SETUP.md).
 
 ## Repository Structure
 
 ```
-PLG-IDE/
+plg-ide/
 ├── config/                      # Configuration files
 │   ├── mcp-cursor-core.json     # MCP config for Cursor + Core
 │   ├── mcp-cursor-cloud.json    # MCP config for Cursor + Cloud
@@ -150,25 +113,21 @@ PLG-IDE/
 │   ├── core.env.template        # Python env for Core
 │   └── cloud.env.template       # Python env for Cloud
 ├── lib/                         # Python runtime abstraction
-├── verticals/                   # Industry-specific demos
-│   └── gaming/
-│       ├── schema/              # Table definitions
-│       ├── data/                # Data loading scripts
-│       └── features/            # Feature demos
+├── verticals/                   # Industry-specific demos (each has schema/, data/, demo_*.sql, features/)
+│   ├── gaming/                  # Leaderboards, player analytics
+│   ├── ecommerce/               # Retail, revenue, product analytics
+│   ├── adtech/                  # Campaigns, impressions, publishers
+│   ├── observability/           # Logs, metrics, tracing
+│   └── financial/              # Transactions, risk, reporting
 ├── features/                    # Cross-vertical feature docs
+├── docs/                        # App spec, Loveable entry, app-manifest.json
 └── .cursor/rules/               # IDE integration rules
 ```
 
 ## Requirements
 
-**For MCP-based IDE experience (recommended):**
-- Docker (for MCP server and Firebolt Core)
-- Cursor, Claude Desktop, or other MCP-compatible IDE
-
-**For Python benchmark scripts:**
-- Python 3.9+
-- Docker (for Firebolt Core) OR Firebolt Cloud account
-- pip packages: `firebolt-sdk`, `tabulate`, `python-dotenv`
+- **MCP (recommended):** Docker, Cursor or [another MCP client](https://modelcontextprotocol.io/clients)
+- **Python benchmarks:** Python 3.9+, `pip install -r requirements.txt`, and Docker or a Firebolt Cloud account
 
 ## Roadmap
 
@@ -177,10 +136,10 @@ See [ROADMAP.md](ROADMAP.md) for planned verticals and features:
 | Verticals | Features |
 |-----------|----------|
 | ✅ Gaming | ✅ Aggregating Indexes |
-| 🔲 E-commerce | 🔲 Late Materialization |
-| 🔲 AdTech | 🔲 Vector Search |
-| 🔲 Observability | 🔲 High Concurrency |
-| 🔲 Financial | 🔲 Streaming Ingestion |
+| ✅ E-commerce | 🔲 Late Materialization |
+| ✅ AdTech | 🔲 Vector Search |
+| ✅ Observability | 🔲 High Concurrency |
+| ✅ Financial | 🔲 Streaming Ingestion |
 
 ## License
 

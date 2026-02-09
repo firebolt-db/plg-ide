@@ -1,5 +1,5 @@
 -- =============================================================================
--- FIREBOLT PLG-IDE: Ultra Fast Gaming Demo
+-- FIREBOLT plg-ide: Ultra Fast Gaming Demo
 -- =============================================================================
 -- 
 -- This script demonstrates Firebolt's capabilities through a step-by-step
@@ -897,7 +897,7 @@ SET enable_result_cache = TRUE;
 -- │    https://docs.firebolt.io/godocs/Guides/working-with-indexes/        │
 -- │    using-aggregating-indexes.html                                      │
 -- │                                                                         │
--- │  Other PLG-IDE Demos:                                                   │
+-- │  Other plg-ide Demos:                                                   │
 -- │    • Late Materialization - reduce I/O on wide tables                  │
 -- │    • Vector Search - semantic similarity with HNSW indexes             │
 -- │    • High Concurrency - workload isolation for mixed use cases         │

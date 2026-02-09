@@ -2,6 +2,8 @@
 
 The [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) connects your AI-powered IDE directly to Firebolt, enabling natural language queries, documentation access, and interactive demos.
 
+**Cursor users:** For Firebolt Core, use the [Add to Cursor](../README.md#1-add-firebolt-mcp-to-cursor-one-click) button in the repo README for one-click MCP install.
+
 ## Recommended: Let the IDE Guide You
 
 When you open this repo in Cursor and ask "Help me get started", the AI will:

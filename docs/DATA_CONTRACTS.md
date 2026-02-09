@@ -1,6 +1,6 @@
-# PLG-IDE Data Contracts
+# plg-ide Data Contracts
 
-> TypeScript interfaces for all data shapes used in the PLG-IDE web application
+> TypeScript interfaces for all data shapes used in the plg-ide web application
 
 ## Runtime & Connection
 

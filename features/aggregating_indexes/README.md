@@ -97,4 +97,14 @@ LIMIT 100;
 
 ## Try It
 
-See the [Gaming Vertical Demo](../../verticals/gaming/features/aggregating_indexes/) for a hands-on experience.
+Aggregating indexes demos are available in all verticals:
+
+| Vertical | Demo Path |
+|----------|-----------|
+| [Gaming](../../verticals/gaming/features/aggregating_indexes/) | Leaderboards, DAU, player profiles |
+| [E-commerce](../../verticals/ecommerce/features/aggregating_indexes/) | Product sales, daily revenue, brand performance |
+| [AdTech](../../verticals/adtech/features/aggregating_indexes/) | Campaign by day, publisher performance |
+| [Observability](../../verticals/observability/features/aggregating_indexes/) | Log count by service/day, error rate |
+| [Financial](../../verticals/financial/features/aggregating_indexes/) | Transaction volume by day, merchant performance |
+
+Run `python benchmark.py` from any vertical's `features/aggregating_indexes/` folder (with that vertical's database set).

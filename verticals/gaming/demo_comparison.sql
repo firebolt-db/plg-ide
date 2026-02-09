@@ -1,11 +1,36 @@
 -- =============================================================================
--- FIREBOLT PLG-IDE: Side-by-Side Comparison Demo
+-- FIREBOLT plg-ide: Side-by-Side Comparison Demo
 -- =============================================================================
 -- 
 -- This script provides CLEAR before/after comparisons of aggregating indexes.
 -- Run this AFTER demo_full.sql has set up the data and indexes.
 --
 -- PURPOSE: Generate impressive metrics for demos, presentations, and training
+-- 
+-- ┌─────────────────────────────────────────────────────────────────────────────┐
+-- │                    FOR PRESENTERS: KEY TALKING POINTS                       │
+-- ├─────────────────────────────────────────────────────────────────────────────┤
+-- │                                                                             │
+-- │  VALUE PROPOSITION:                                                         │
+-- │  "Firebolt's aggregating indexes deliver 50-100X faster queries with        │
+-- │   99%+ reduction in data scanned. This translates to:"                      │
+-- │   • Real-time dashboards instead of stale hourly reports                    │
+-- │   • 99% lower query costs (pay for KB scanned, not GB)                     │
+-- │   • Support 1000+ concurrent users on the same hardware                   │
+-- │   • No code changes - your existing SQL just gets faster"                   │
+-- │                                                                             │
+-- │  COMPETITIVE ADVANTAGE:                                                    │
+-- │  • "ClickHouse requires materialized views + manual refresh + maintenance" │
+-- │  • "Snowflake has no equivalent - you pay for every full table scan"      │
+-- │  • "BigQuery clustering helps but doesn't pre-compute aggregations"        │
+-- │  • "Redshift requires complex VACUUM and ANALYZE operations"              │
+-- │                                                                             │
+-- │  BUSINESS IMPACT:                                                           │
+-- │  • "Lurkit achieved 10X larger historical queries with 40% cost savings"   │
+-- │  • "Every millisecond saved = better user experience"                      │
+-- │  • "Cost savings scale linearly with data volume"                          │
+-- │                                                                             │
+-- └─────────────────────────────────────────────────────────────────────────────┘
 -- 
 -- =============================================================================
 

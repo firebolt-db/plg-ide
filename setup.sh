@@ -1,5 +1,5 @@
 #!/bin/bash
-# PLG-IDE Setup Script
+# plg-ide Setup Script
 # Installs prerequisites - MCP configuration happens in the IDE
 
 set -e
@@ -12,7 +12,7 @@ NC='\033[0m'
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║               PLG-IDE: Prerequisites Setup                   ║"
+echo "║               plg-ide: Prerequisites Setup                   ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
