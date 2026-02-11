@@ -133,7 +133,12 @@ plg-ide/
 │   └── mcp-claude-desktop.json # Claude Desktop config
 ├── lib/                 # Python runtime (for automated benchmarks)
 ├── verticals/           # Industry-specific demos
-│   └── gaming/          # Gaming analytics vertical
+│   ├── gaming/          # Gaming analytics vertical
+│   ├── ecommerce/
+│   ├── adtech/
+│   ├── observability/
+│   ├── financial/
+│   └── cybertech/       # Placeholder (data and capabilities TBD)
 ├── features/            # Cross-vertical feature documentation
 └── .cursor/rules/       # This file
 ```

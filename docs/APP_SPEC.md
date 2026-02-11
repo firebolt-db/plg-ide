@@ -2,7 +2,7 @@
 
 > UI specification for the plg-ide web application (Loveable build target)
 >
-> **For Loveable:** Use `docs/app-manifest.json` for the list of verticals and their features (Gaming, E-commerce, AdTech, Observability, Financial). Use `docs/LOVEABLE.md` as the build entry point.
+> **For Loveable:** Use `docs/app-manifest.json` for the list of verticals and their features (Gaming, E-commerce, AdTech, Observability, Financial, CyberTech). Use `docs/LOVEABLE.md` as the build entry point.
 >
 > **Connectivity:** The app must not use dummy or mock Firebolt calls. All SQL execution and metrics require a real connection to Firebolt Core or Firebolt Cloud. Guide users through the Setup Wizard to establish connection; see **docs/LOVEABLE.md** (§ Connectivity Rules).
 
@@ -45,7 +45,7 @@
 │  ┌─────────────────────────────────────────────────┐   │
 │  │  Step 2: Choose Your Vertical                    │   │
 │  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐   │
-│  │  │ Gaming │ │E-comm  │ │ AdTech │ │Observe │ │Financial│   │
+│  │  │ Gaming │ │E-comm  │ │ AdTech │ │Observe │ │Financial│ │CyberTech│   │
 │  │  └────────┘ └────────┘ └────────┘ └────────┘ └────────┘   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                         │

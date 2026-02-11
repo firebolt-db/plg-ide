@@ -70,6 +70,18 @@
         { "id": "aggregating_indexes", "name": "Aggregating Indexes", "description": "Transaction and merchant aggregations", "status": "available" },
         { "id": "time_travel", "name": "Time Travel", "description": "Point-in-time queries for compliance", "status": "coming_soon" }
       ]
+    },
+    {
+      "id": "cybertech",
+      "name": "CyberTech",
+      "description": "Security analytics, threat detection, compliance (placeholder — data and capabilities TBD)",
+      "dataset": "TBD",
+      "database": "cybertech",
+      "tables": [],
+      "rowCount": "TBD",
+      "features": [
+        { "id": "coming_soon", "name": "Coming soon", "description": "Dataset and feature demos for this vertical will be added in a future release.", "status": "coming_soon" }
+      ]
     }
   ],
   "features_global": [

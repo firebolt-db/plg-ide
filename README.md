@@ -50,6 +50,7 @@ Industry-specific demos with real datasets:
 | [AdTech](verticals/adtech/) | AdTech | Custom | High QPS, campaign analytics, real-time bidding |
 | [Observability](verticals/observability/) | Observability | Custom | Log analytics, metrics aggregation, distributed tracing |
 | [Financial](verticals/financial/) | Financial Services | Custom | Transaction analytics, risk scoring, regulatory reporting |
+| [CyberTech](verticals/cybertech/) | TBD | TBD | Security analytics, threat detection, compliance (placeholder) |
 
 ### Features
 
@@ -120,7 +121,8 @@ plg-ide/
 │   ├── ecommerce/               # Retail, revenue, product analytics
 │   ├── adtech/                  # Campaigns, impressions, publishers
 │   ├── observability/           # Logs, metrics, tracing
-│   └── financial/              # Transactions, risk, reporting
+│   ├── financial/               # Transactions, risk, reporting
+│   └── cybertech/               # Security, threat detection (placeholder)
 ├── features/                    # Cross-vertical feature docs
 ├── docs/                        # App spec, Loveable entry, app-manifest.json
 └── .cursor/rules/               # IDE integration rules

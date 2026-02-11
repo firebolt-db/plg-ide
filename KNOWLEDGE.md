@@ -149,6 +149,7 @@ Industry-specific demos with realistic data:
 - AdTech (impression tracking, campaign performance)
 - Observability (log analytics, metrics aggregation)
 - Financial (transaction analysis, risk calculations)
+- CyberTech (security analytics, threat detection, compliance — placeholder)
 
 ### 3. Feature Demos
 Each demo shows a Firebolt capability:
@@ -222,7 +223,7 @@ Interactive SQL editor for:
 Use these prompts to build the app incrementally:
 
 1. "Create a home page with runtime selection (Core vs Cloud) using Firebolt brand colors"
-2. "Build a vertical selection grid with cards for Gaming, E-commerce, AdTech, Observability"
+2. "Build a vertical selection grid with cards for Gaming, E-commerce, AdTech, Observability, Financial, CyberTech"
 3. "Create a feature demo page with before/after comparison cards showing metrics"
 4. "Add a SQL editor component with dark theme and Roboto Mono font"
 5. "Build a benchmark results component with large metric numbers and improvement percentages"
@@ -243,7 +244,8 @@ plg-ide/
 │   ├── ecommerce/        # Retail, revenue, product analytics
 │   ├── adtech/           # Campaigns, impressions, publishers
 │   ├── observability/    # Logs, metrics, tracing
-│   └── financial/        # Transactions, risk, reporting
+│   ├── financial/       # Transactions, risk, reporting
+│   └── cybertech/       # Security, threat detection (placeholder)
 │       ├── schema/       # Table definitions (SQL)
 │       ├── data/         # Data loading (SQL/Python)
 │       ├── demo_full.sql # Full walkthrough + talking points

@@ -39,7 +39,7 @@ Every vertical's **comparison demo** (e.g. `demo_comparison.sql`) must:
 3. **Progress tracking:** A `demo_progress` table (session_id, step_id, completed_at) is created in Setup. Before each runnable step, insert a row (e.g. `INSERT INTO demo_progress ... VALUES (SESSION_USER(), '1', NOW());`). Step IDs are consistent (e.g. '1'–'5'). This supports IDE or app progress display.
 4. **Setup:** Create `demo_progress`, ensure the index/feature exists so the first query is fast, disable result cache. **Cleanup:** Re-enable result cache; optional completion message.
 
-**Reference:** Existing `verticals/*/demo_comparison.sql` (gaming, ecommerce, adtech, observability, financial) are the canonical examples. New verticals or new comparison demos must follow the same structure.
+**Reference:** Existing `verticals/*/demo_comparison.sql` (gaming, ecommerce, adtech, observability, financial) are the canonical examples. CyberTech is a placeholder vertical (data and capabilities TBD); when implemented, it must follow the same pattern. New verticals or new comparison demos must follow the same structure.
 
 ### 2.4 App Setup Wizard (Steps and Order)
 

@@ -18,6 +18,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 │ AdTech          │    ✓      │             │            │           │        │
 │ Observability   │    ✓      │             │            │           │        │
 │ Financial       │    ✓      │             │            │           │        │
+│ CyberTech       │   (TBD)   │             │            │           │        │
 └─────────────────┴───────────┴─────────────┴────────────┴───────────┴────────┘
 ```
 
@@ -102,6 +103,15 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 | Regulatory Reporting | Point-in-time queries | Time Travel |
 
 **Status**: Schema, data loading, aggregating indexes demo, demo_full, demo_comparison complete.
+
+---
+
+### 🔲 CyberTech (Placeholder)
+
+**Dataset**: TBD  
+**Scope**: Security analytics, threat detection, compliance.
+
+**Status**: Placeholder vertical added; dataset, schema, data, and feature demos to be defined in a future release. See `verticals/cybertech/README.md`.
 
 ---
 

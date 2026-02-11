@@ -38,7 +38,7 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 
 ## 2. What You Are Building
 
-- **Product:** plg-ide – a web app that lets users connect to Firebolt (Core or Cloud), pick an industry vertical (Gaming, E-commerce, AdTech, Observability, Financial), run feature demos (e.g. Aggregating Indexes), and see **before/after benchmark metrics** (query time, rows scanned, bytes read).
+- **Product:** plg-ide – a web app that lets users connect to Firebolt (Core or Cloud), pick an industry vertical (Gaming, E-commerce, AdTech, Observability, Financial, CyberTech), run feature demos (e.g. Aggregating Indexes), and see **before/after benchmark metrics** (query time, rows scanned, bytes read).
 - **Users:** Sales engineers (demos), developers (evaluation), partners (training).
 - **Principle:** Every demo shows measurable improvement (e.g. "50–100X faster with aggregating indexes").
 
@@ -107,7 +107,8 @@ plg-ide/
     ├── ecommerce/
     ├── adtech/
     ├── observability/
-    └── financial/
+    ├── financial/
+    └── cybertech/                ← placeholder (data and capabilities TBD)
 ```
 
 ---
