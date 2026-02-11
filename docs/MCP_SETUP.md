@@ -4,13 +4,32 @@ The [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) connects yo
 
 **Cursor users:** For Firebolt Core, use the [Add to Cursor](../README.md#1-add-firebolt-mcp-to-cursor-one-click) button in the repo README for one-click MCP install.
 
+## Check if the MCP server is running
+
+Before running demos from the IDE, the Firebolt MCP server must be available to your editor (e.g. Cursor). When you open this repo and ask for help getting started, the AI will:
+
+1. **Check:** Ask whether you already have the Firebolt MCP server running (e.g. added in Cursor Settings → MCP).
+2. **If not:** Offer to help you **install it locally** so the IDE can talk to Firebolt.
+
+### Install locally (if not already running)
+
+You can run the MCP server in two ways (see the [Firebolt MCP Server repo](https://github.com/firebolt-db/mcp-server) for full details):
+
+| Option | Description |
+|--------|-------------|
+| **Docker (recommended)** | Run `ghcr.io/firebolt-db/mcp-server:0.6.0` as a container. Cursor will start it when needed; you add the config to Cursor Settings → MCP (Core or Cloud config below). |
+| **Binary** | Download the binary for your OS from [Releases](https://github.com/firebolt-db/mcp-server/releases) and point Cursor at it in MCP settings instead of Docker. |
+
+**Cursor:** Cursor does not support MCP resources yet. You **must** set `FIREBOLT_MCP_DISABLE_RESOURCES=true` in the MCP server environment (the configs in this guide include it).
+
 ## Recommended: Let the IDE Guide You
 
 When you open this repo in Cursor and ask "Help me get started", the AI will:
 
-1. Ask which runtime you want (Core or Cloud)
-2. Provide the exact MCP configuration for your choice
-3. Walk you through setup step by step
+1. Check whether you have the Firebolt MCP server running; if not, offer to install it locally (link to [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server)).
+2. Ask which runtime you want (Core or Cloud)
+3. Provide the exact MCP configuration for your choice
+4. Walk you through setup step by step
 
 This is the easiest way to get configured correctly.
 

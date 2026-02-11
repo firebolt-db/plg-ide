@@ -14,6 +14,45 @@ This applies to: Setup Wizard (create/select database), Data Loading (load demo 
 
 ---
 
+## Flow 0: IDE (Cursor) – Check Firebolt MCP Server
+
+**Goal:** Ensure the user can use Firebolt from the IDE before runtime selection or demos.
+
+**Persona:** User in Cursor (or another MCP-capable IDE) with this repo.
+
+**When:** At first interaction or when the user asks to get started in the IDE.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. Check: "Do you have the Firebolt MCP server running?"│
+│     └─ (e.g. already added to Cursor Settings → MCP)     │
+│                                                         │
+│  2a. If YES                                              │
+│     └─ Verify with firebolt_connect (or equivalent)     │
+│     └─ Continue to runtime selection (Flow 1)          │
+│                                                         │
+│  2b. If NO or UNSURE                                     │
+│     └─ Offer to install it locally                     │
+│     └─ Option A: Docker (recommended)                   │
+│     │   └─ Use image ghcr.io/firebolt-db/mcp-server    │
+│     │   └─ Config added in next step (after runtime)   │
+│     └─ Option B: Binary                                 │
+│     │   └─ Download from GitHub Releases for their OS  │
+│     └─ Link: https://github.com/firebolt-db/mcp-server   │
+│     └─ Cursor: must set FIREBOLT_MCP_DISABLE_RESOURCES  │
+│         =true in MCP server env                          │
+│     └─ After user confirms install → runtime selection  │
+│                                                         │
+│  3. Proceed to Flow 1 (runtime + connection + target)  │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Success Criteria:** User has MCP server available (running or instructed how to install). No demos or Firebolt operations until MCP is configured when using the IDE path.
+
+**Reference:** [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) – install options, Docker/binary, Cursor requirements.
+
+---
+
 ## Flow 1: First-Time Setup
 
 **Goal:** Connect to Firebolt and prepare for demos

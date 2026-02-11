@@ -55,6 +55,20 @@ Do not skip or reorder these. Do not add a "continue without confirming" path.
 
 **Reference:** docs/APP_SPEC.md (Setup Wizard), docs/USER_FLOWS.md (Flow 1, Flow 1b).
 
+### 2.5 IDE (Cursor): Check MCP Server and Offer Local Install
+
+For users in Cursor (or other MCP-capable IDEs), the guided experience must:
+
+1. **Check** whether the Firebolt MCP server is already running (e.g. configured in Cursor Settings → MCP).
+2. **If not:** Ask and give the user the **option to install it locally** before runtime selection or demos. Offer:
+   - **Docker (recommended):** image `ghcr.io/firebolt-db/mcp-server:0.6.0`; config provided after they choose runtime.
+   - **Binary:** download from [Firebolt MCP Server Releases](https://github.com/firebolt-db/mcp-server/releases).
+3. **Cursor:** Require `FIREBOLT_MCP_DISABLE_RESOURCES=true` in MCP server env (Cursor does not support MCP resources yet).
+
+Do not assume MCP is already set up; check and offer install so users are not stuck.
+
+**Reference:** [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server), docs/USER_FLOWS.md (Flow 0), docs/MCP_SETUP.md, .cursor/rules/plg-ide.mdc.
+
 ---
 
 ## 3. Adding New Demo Capabilities
