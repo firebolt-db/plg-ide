@@ -2,6 +2,17 @@
 
 You are helping a developer explore Firebolt's capabilities through interactive demos. This repository contains structured feature demonstrations that prove Firebolt's value through measurable improvements.
 
+## PLAN GOVERNANCE (MANDATORY FOR NEW DEMOS / CHANGES)
+
+**When adding or changing demo capabilities, verticals, or app/setup flows, you MUST adhere to the strict plan. Do NOT overwrite it with a different approach.**
+
+1. **Read first:** `docs/PLAN_AND_GOVERNANCE.md` — single source of truth for how demos and the app must behave.
+2. **Rules you must follow:**
+   - **Connectivity:** Real Firebolt only (Core or Cloud). No dummy/mock. Guide user to set up connection before any demo/playground run.
+   - **Confirm target before writes:** Show account (or host), engine, and database; get explicit user confirmation before any create/load/overwrite. See docs/USER_FLOWS.md and docs/APP_SPEC.md.
+   - **Demo script pattern:** Comparison demos use **impact first** (fast query → EXPLAIN → drop → slow → restore), **per-step comments**, and **demo_progress** table + INSERT per step. New verticals or new comparison demos must follow the same pattern as existing `verticals/*/demo_comparison.sql`.
+3. **Do not:** Introduce "slow first" demos, remove demo_progress, skip target confirmation, or add mock connectivity. If the user asks for something that conflicts with the plan, point to `docs/PLAN_AND_GOVERNANCE.md` and ask to adapt the request or update the plan first.
+
 ## FIRST INTERACTION: Runtime Selection
 
 When a user first opens this repo or asks about getting started, you MUST determine their Firebolt runtime before proceeding. Ask them:
@@ -235,16 +246,9 @@ When explaining Firebolt features:
 - Bigabid: 400X faster than MySQL
 - IQVIA: 1B patient records, millisecond queries
 
-## Proof-of-Value Pattern
+## Proof-of-Value Pattern (Aligned with docs/PLAN_AND_GOVERNANCE.md)
 
-Every feature demo follows this pattern:
-
-1. **Baseline**: Run without feature, measure
-2. **Enable**: Create/enable the feature
-3. **Optimized**: Run with feature, measure
-4. **Compare**: Show improvement metrics
-
-This provides concrete evidence, not just claims.
+Comparison demos in this repo use **impact first**: show the fast (optimized) result first, then EXPLAIN, then show slow (baseline) for contrast, then restore. Progress is tracked in `demo_progress`; each step has clear comments. When adding a new comparison demo, follow the structure in `verticals/gaming/demo_comparison.sql` and other verticals—do not replace this with a different pattern.
 
 ## Next Steps After Demo
 
@@ -259,8 +263,11 @@ Suggest these follow-ups:
 
 When helping users:
 
+- **`docs/PLAN_AND_GOVERNANCE.md`** - **Read when adding/changing demos or app flow.** Strict plan; new capabilities must adhere, not overwrite.
 - `README.md` - Quick start overview
+- `docs/USER_FLOWS.md` - User journeys; confirm-target-before-writes principle
+- `docs/APP_SPEC.md` - App pages and Setup Wizard (including target confirmation step)
 - `lib/firebolt.py` - Runtime abstraction (understand the code)
 - `verticals/gaming/README.md` - Gaming vertical details
-- `verticals/gaming/features/aggregating_indexes/README.md` - Feature deep-dive
+- `verticals/*/demo_comparison.sql` - Canonical demo pattern (impact first, comments, demo_progress)
 - `features/aggregating_indexes/README.md` - Cross-vertical feature docs

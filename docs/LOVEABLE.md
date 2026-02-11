@@ -17,10 +17,11 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 | **Connection required** | Before running any demo or playground query, the app must require a successful connection (Core or Cloud). If not connected, show the setup flow—do not fall back to fake data. |
 | **Guide to setup** | The primary path is: **help the user connect** (Firebolt Core local or Firebolt Cloud). Use the Connection Setup Wizard (`/setup`) and clear copy for Core vs Cloud (e.g. "No account? Start with Firebolt Core (free, local)."). See **docs/USER_FLOWS.md** for Flow 1 and Flow 1b. |
 | **Errors are real** | If connection or query fails, show the real error and recovery options (retry, fix credentials, switch to Core), not a generic "demo mode" result. |
+| **Confirm target before writes** | Get user feedback and validation of the **account, engine, and database** that the demo will write to (or create). Show a confirmation step that displays these values; do not create, overwrite, or load data until the user explicitly confirms. See **docs/USER_FLOWS.md** (principle "Confirm Target Before Any Writes") and **docs/APP_SPEC.md** (Setup Wizard Step 4). |
 
-**Summary for Loveable:** Build the app so that **every metric and every result** comes from a real Firebolt session. Guide users through **Firebolt Core** (localhost, no account) or **Firebolt Cloud** (credentials) until connection succeeds; only then allow demos and SQL execution.
+**Summary for Loveable:** Build the app so that **every metric and every result** comes from a real Firebolt session. Guide users through **Firebolt Core** (localhost, no account) or **Firebolt Cloud** (credentials) until connection succeeds; only then allow demos and SQL execution. **Before any write** (create database, load data, run demos that write): show account/engine/database and get explicit user confirmation—never change or overwrite anything without that validation.
 
-**When starting a Loveable session with this repo:** Tell Loveable to read **docs/LOVEABLE.md** first (this file), then **KNOWLEDGE.md**, **docs/APP_SPEC.md**, **docs/DATA_CONTRACTS.md**, **docs/USER_FLOWS.md**, and **docs/app-manifest.json**. Emphasize: "Do not implement dummy or mock Firebolt—require real connectivity (Firebolt Core or Cloud) and guide the user through the connection setup before any demo or SQL execution."
+**When starting a Loveable session with this repo:** Tell Loveable to read **docs/LOVEABLE.md** first (this file), then **docs/PLAN_AND_GOVERNANCE.md** (strict plan—adhere, do not overwrite), then **KNOWLEDGE.md**, **docs/APP_SPEC.md**, **docs/DATA_CONTRACTS.md**, **docs/USER_FLOWS.md**, and **docs/app-manifest.json**. Emphasize: "Do not implement dummy or mock Firebolt—require real connectivity and confirm target (account, engine, database) before any write. New capabilities must follow the plan in PLAN_AND_GOVERNANCE.md."
 
 ---
 
@@ -28,11 +29,12 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 
 | Order | File | Why |
 |-------|------|-----|
-| 1 | **KNOWLEDGE.md** (repo root) | Product vision, design system (colors, typography, components), core features, technical constraints, UI guidelines |
-| 2 | **docs/APP_SPEC.md** | Page structure (routes), layout of every page, component list, responsive breakpoints |
-| 3 | **docs/DATA_CONTRACTS.md** | TypeScript interfaces for runtime, verticals, benchmarks, SQL playground, API requests/responses |
-| 4 | **docs/USER_FLOWS.md** | Step-by-step user journeys (setup, run demo, load data, playground, errors) |
-| 5 | **docs/app-manifest.json** | Data-driven list of verticals and features (use for navigation and demo selection) |
+| 1 | **docs/PLAN_AND_GOVERNANCE.md** | Strict plan: connectivity, confirm target before writes, demo pattern (impact first, comments, progress). New capabilities must adhere; do not overwrite. |
+| 2 | **KNOWLEDGE.md** (repo root) | Product vision, design system (colors, typography, components), core features, technical constraints, UI guidelines |
+| 3 | **docs/APP_SPEC.md** | Page structure (routes), layout of every page, component list, responsive breakpoints |
+| 4 | **docs/DATA_CONTRACTS.md** | TypeScript interfaces for runtime, verticals, benchmarks, SQL playground, API requests/responses |
+| 5 | **docs/USER_FLOWS.md** | Step-by-step user journeys (setup, run demo, load data, playground, errors) |
+| 6 | **docs/app-manifest.json** | Data-driven list of verticals and features (use for navigation and demo selection) |
 
 ## 2. What You Are Building
 
@@ -82,7 +84,7 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 Copy-paste these to build incrementally. **Remember: no dummy/mock Firebolt—all execution and metrics must use a real connection (see Connectivity Rules above).**
 
 1. "Using KNOWLEDGE.md and docs/APP_SPEC.md, create the home page with runtime selection (Core vs Cloud) and vertical selection grid. Use docs/app-manifest.json for the list of verticals. Apply Firebolt design system: #F72A30 primary, Poppins headings, Inter body. Do not add a 'try without connecting' or mock mode—users must choose Core or Cloud and complete setup."
-2. "Add the connection setup wizard (multi-step). Steps: (1) Confirm runtime (Core or Cloud), (2) Connection details – Core: host URL (e.g. localhost:3473), Cloud: client ID, secret, account, engine, (3) Test connection (real call to Firebolt—no stub), (4) Database setup. Use docs/USER_FLOWS.md. If connection fails, show the error and offer 'Switch to Firebolt Core' or fix credentials; never fall back to fake data."
+2. "Add the connection setup wizard (multi-step). Steps: (1) Confirm runtime (Core or Cloud), (2) Connection details – Core: host URL (e.g. localhost:3473), Cloud: client ID, secret, account, engine, (3) Test connection (real call to Firebolt—no stub), (4) **Confirm target** – show account (or host), engine, and database that demos will use; require user to confirm or change before any create/write; (5) Database setup (create or select). Use docs/USER_FLOWS.md and docs/APP_SPEC.md. Do not create or overwrite anything without user validation of the target."
 3. "Build the Feature Demo Runner page: two cards (Baseline vs Optimized), each with Query Time, Rows Scanned, Bytes Read and improvement %. Add SQL viewer and Run Baseline / Run Optimized buttons. Use docs/DATA_CONTRACTS.md for BenchmarkResult and QueryMetrics. Require an established Firebolt connection before allowing Run; metrics must come from real query execution, not mocks."
 4. "Add the SQL Playground page: editor (dark theme #1A0404, Roboto Mono), Run button, results table, execution time, schema browser. Use DATA_CONTRACTS for QueryResult and EditorState. Run must call the real backend/Firebolt; disable Run or show 'Connect first' until connection is successful."
 
@@ -90,16 +92,17 @@ Copy-paste these to build incrementally. **Remember: no dummy/mock Firebolt—al
 
 ```
 plg-ide/
-├── KNOWLEDGE.md              ← Primary context (vision, design, features)
-├── README.md                  ← User-facing getting started
-├── ROADMAP.md                 ← Loveable build phases (L1–L5), starter prompts
+├── KNOWLEDGE.md                  ← Primary context (vision, design, features)
+├── README.md                     ← User-facing getting started
+├── ROADMAP.md                    ← Loveable build phases (L1–L5), starter prompts
 ├── docs/
-│   ├── LOVEABLE.md            ← This file (entry point for Loveable)
-│   ├── APP_SPEC.md            ← Pages, layouts, components
-│   ├── DATA_CONTRACTS.md      ← TypeScript interfaces
-│   ├── USER_FLOWS.md          ← User journeys
-│   └── app-manifest.json      ← Verticals + features (data for app)
-└── verticals/                 ← SQL demos (schema, data, benchmarks)
+│   ├── LOVEABLE.md               ← This file (entry point for Loveable)
+│   ├── PLAN_AND_GOVERNANCE.md     ← Strict plan: adhere when adding demos/app flows; do not overwrite
+│   ├── APP_SPEC.md                ← Pages, layouts, components
+│   ├── DATA_CONTRACTS.md          ← TypeScript interfaces
+│   ├── USER_FLOWS.md              ← User journeys
+│   └── app-manifest.json          ← Verticals + features (data for app)
+└── verticals/                    ← SQL demos (schema, data, benchmarks)
     ├── gaming/
     ├── ecommerce/
     ├── adtech/
@@ -109,4 +112,4 @@ plg-ide/
 
 ---
 
-**Summary:** The repo is well structured for Loveable. Give Loveable **KNOWLEDGE.md**, **docs/APP_SPEC.md**, **docs/DATA_CONTRACTS.md**, **docs/USER_FLOWS.md**, and **docs/app-manifest.json**, and point it to **docs/LOVEABLE.md** as the entry point. Use the build order and starter prompts above for incremental delivery.
+**Summary:** The repo is well structured for Loveable. Give Loveable **docs/PLAN_AND_GOVERNANCE.md** first (strict plan), then **KNOWLEDGE.md**, **docs/APP_SPEC.md**, **docs/DATA_CONTRACTS.md**, **docs/USER_FLOWS.md**, and **docs/app-manifest.json**; use **docs/LOVEABLE.md** as the entry point. New capabilities must adhere to the plan—real connectivity, confirm target before writes, impact-first demo pattern—and must not overwrite it with a different approach. Use the build order and starter prompts above for incremental delivery.

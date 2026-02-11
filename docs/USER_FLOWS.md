@@ -2,6 +2,18 @@
 
 > Step-by-step user journeys for the plg-ide web application
 
+## Principle: Confirm Target Before Any Writes
+
+**Never create, overwrite, or write to a database without the user having seen and confirmed the exact target.** The app must:
+
+1. **Show** the user the account (Cloud) or host (Core), engine, and database that demos will use or create.
+2. **Get explicit validation** (e.g. "I confirm" or "Use this target") before any operation that creates databases, creates tables, or loads/overwrites data.
+3. **Allow correction** — user can go back and change engine or database name before confirming.
+
+This applies to: Setup Wizard (create/select database), Data Loading (load demo data), and any feature that writes to Firebolt.
+
+---
+
 ## Flow 1: First-Time Setup
 
 **Goal:** Connect to Firebolt and prepare for demos
@@ -28,18 +40,27 @@
 │     ├─ See loading spinner                             │
 │     └─ See success (green) or error (red) indicator    │
 │                                                         │
-│  5. Setup Database (if needed)                          │
-│     ├─ Option: "Create demo database" checkbox         │
-│     └─ Click "Continue"                                │
+│  5. Confirm Target (required before any write)           │
+│     ├─ Show summary: Account (or host), Engine, Database │
+│     ├─ "Demos will run and may create/load data here"  │
+│     ├─ User confirms or goes back to change engine/DB  │
+│     └─ Only after confirm → enable database setup       │
 │                                                         │
-│  6. Redirect to Vertical Selection                      │
+│  6. Setup Database (after target confirmed)             │
+│     ├─ Option: Create demo database (name shown)       │
+│     ├─ Option: Select existing database                │
+│     └─ Click "Continue" (no create/overwrite yet if    │
+│         "Create" chosen until user triggers Load Data)  │
+│                                                         │
+│  7. Redirect to Vertical Selection                      │
 │     └─ See grid of available verticals                 │
 └─────────────────────────────────────────────────────────┘
 ```
 
 **Success Criteria:**
 - Connection established
-- Database ready
+- User has confirmed the account, engine, and database target
+- Database selected or created only after confirmation
 - User sees vertical selection
 
 **Error Handling:**
@@ -73,7 +94,9 @@
 │     ├─ Step 2: Host (default localhost:3473)            │
 │     ├─ Step 3: Test connection                         │
 │     │   └─ If Core not running: show "Start Core" help  │
-│     └─ Step 4: Database setup → Continue                │
+│     ├─ Step 4: Confirm target (host, engine, database)  │
+│     │   └─ User validates before any create/write      │
+│     └─ Step 5: Database setup → Continue                │
 │                                                         │
 │  4. User reaches Vertical Selection and can run demos   │
 └─────────────────────────────────────────────────────────┘
@@ -171,23 +194,27 @@
 │  3. Click "Load Demo Data"                              │
 │     └─ Opens data loading wizard                       │
 │                                                         │
-│  4. Choose Data Source                                  │
+│  4. Confirm Target (if not already confirmed in setup)  │
+│     ├─ Show: Account (or host), Engine, Database       │
+│     └─ "Data will be created/loaded here." User confirms│
+│                                                         │
+│  5. Choose Data Source                                  │
 │     ├─ Option A: Load from Firebolt S3 (recommended)   │
 │     │   └─ Uses COPY INTO from public bucket           │
 │     └─ Option B: Generate sample data                  │
 │         └─ Inserts smaller synthetic dataset           │
 │                                                         │
-│  5. Execute Loading                                     │
+│  6. Execute Loading (only after target confirmed)       │
 │     ├─ See progress: "Creating tables..."              │
 │     ├─ See progress: "Loading players (100K rows)..."  │
 │     ├─ See progress: "Loading playstats (400K rows)..."│
 │     └─ See completion: "Data loaded successfully"      │
 │                                                         │
-│  6. Verify Data                                         │
+│  7. Verify Data                                         │
 │     ├─ See row counts for each table                   │
 │     └─ Option: Preview sample rows                     │
 │                                                         │
-│  7. Return to Demo Selection                            │
+│  8. Return to Demo Selection                            │
 │     └─ Feature demos now show as "Ready"               │
 └─────────────────────────────────────────────────────────┘
 ```

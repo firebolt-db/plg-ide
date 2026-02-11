@@ -4,6 +4,8 @@
 > 
 > This repository is in early development. Structure, APIs, and demos are subject to change.
 > See [ROADMAP.md](ROADMAP.md) for planned features and timeline.
+>
+> **Adding new demos or changing app/setup flow?** Follow the strict plan in [docs/PLAN_AND_GOVERNANCE.md](docs/PLAN_AND_GOVERNANCE.md). New capabilities must adhere to it (real connectivity, confirm target before writes, impact-first demo pattern); do not replace it with a different approach.
 
 Experience Firebolt's value through interactive, feature-by-feature demonstrations in your IDE.
 

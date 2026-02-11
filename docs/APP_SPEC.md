@@ -84,14 +84,24 @@
 - Success: enable demos and playground. Failure: show error and recovery (e.g. "Switch to Firebolt Core", "Check credentials", "Retry").
 - Do not offer a "Continue anyway" or fake-success path.
 
-**Step 4: Database Setup**
-- Create demo database option (if supported by backend) or select existing database.
-- Then continue to vertical selection.
+**Step 4: Confirm Target (required before any write)**
+- **Show** the user a clear summary of where demos will run and where data may be created/loaded:
+  - **Cloud:** Account name, Engine name, Database name (selected or to be created).
+  - **Core:** Host, Engine (if applicable), Database name.
+- Copy: e.g. "Demos will run here and may create or load data into this database. Please confirm."
+- **Get explicit validation:** e.g. "I confirm" / "Use this target" button. User must confirm before any create or overwrite.
+- **Allow correction:** "Change engine or database" returns to Step 2 (or a database/engine selector) so the user can adjust before confirming.
+- Do **not** create databases, create tables, or load data until the user has confirmed this step.
+
+**Step 5: Database Setup**
+- After target is confirmed: option to create demo database (name pre-filled from target) or select existing database.
+- Then continue to vertical selection. Any actual "Create database" or "Load data" action still requires the user to have validated the target in Step 4.
 
 **Components:**
-- StepIndicator - Shows progress (1/4, 2/4, etc.)
+- StepIndicator - Shows progress (1/5, 2/5, etc.)
 - ConnectionForm - Input fields for Core host or Cloud credentials
 - TestConnectionButton - With loading spinner; triggers real connection test
+- **TargetConfirmation** - Read-only summary (account/host, engine, database) + Confirm / Change buttons
 - SuccessMessage / ErrorMessage
 
 ### 3. Vertical Overview (`/demo/:vertical`)

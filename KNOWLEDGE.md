@@ -3,6 +3,8 @@
 > This file provides context for AI-assisted development (Loveable, Cursor, etc.)
 >
 > **For Loveable:** Use this file as the primary context for product vision and design system. Build entry point: **docs/LOVEABLE.md**. Data for verticals/features: **docs/app-manifest.json**.
+>
+> **Strict plan for demos and app:** When adding or changing demo capabilities or app flows, **adhere to** **docs/PLAN_AND_GOVERNANCE.md**. New work must conform to that plan (real connectivity, confirm target before writes, impact-first demos with comments and progress); do not overwrite it with a different approach.
 
 ## Product Vision
 
