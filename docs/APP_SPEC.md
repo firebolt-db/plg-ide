@@ -3,6 +3,8 @@
 > UI specification for the plg-ide web application (Loveable build target)
 >
 > **For Loveable:** Use `docs/app-manifest.json` for the list of verticals and their features (Gaming, E-commerce, AdTech, Observability, Financial). Use `docs/LOVEABLE.md` as the build entry point.
+>
+> **Connectivity:** The app must not use dummy or mock Firebolt calls. All SQL execution and metrics require a real connection to Firebolt Core or Firebolt Cloud. Guide users through the Setup Wizard to establish connection; see **docs/LOVEABLE.md** (§ Connectivity Rules).
 
 ## Page Structure
 
@@ -64,31 +66,32 @@
 
 ### 2. Setup Wizard (`/setup`)
 
-**Purpose:** Configure connection to Firebolt
+**Purpose:** Configure **real** connection to Firebolt (Core or Cloud). No mock or dummy mode—demos and playground run only after a successful connection.
 
 **Flow:** Multi-step wizard
 
 **Step 1: Runtime Confirmation**
 - Show selected runtime (Core or Cloud)
 - Option to change
+- Copy that guides: e.g. "No account? Start with Firebolt Core (free, local)."
 
 **Step 2: Connection Details**
-- Core: Host URL (default localhost:3473)
-- Cloud: Client ID, Client Secret, Account Name, Engine Name
+- **Core:** Host URL (e.g. `http://localhost:3473`). No credentials.
+- **Cloud:** Client ID, Client Secret, Account Name, Engine (and optionally Database). Short link: "Don't have Cloud credentials? Use Firebolt Core to try demos locally."
 
 **Step 3: Test Connection**
-- "Test Connection" button
-- Success/failure indicator
-- Error message display
+- "Test Connection" button → **must call real Firebolt** (backend or serverless) to verify connectivity.
+- Success: enable demos and playground. Failure: show error and recovery (e.g. "Switch to Firebolt Core", "Check credentials", "Retry").
+- Do not offer a "Continue anyway" or fake-success path.
 
 **Step 4: Database Setup**
-- Create demo database option
-- Select existing database
+- Create demo database option (if supported by backend) or select existing database.
+- Then continue to vertical selection.
 
 **Components:**
 - StepIndicator - Shows progress (1/4, 2/4, etc.)
-- ConnectionForm - Input fields for credentials
-- TestConnectionButton - With loading spinner
+- ConnectionForm - Input fields for Core host or Cloud credentials
+- TestConnectionButton - With loading spinner; triggers real connection test
 - SuccessMessage / ErrorMessage
 
 ### 3. Vertical Overview (`/demo/:vertical`)

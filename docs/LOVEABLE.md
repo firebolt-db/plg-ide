@@ -3,6 +3,27 @@
 > **Use this repo as context for Loveable to build the plg-ide web application.**  
 > Read the files below in order. The app is a Product-Led Growth demo platform for Firebolt.
 
+---
+
+## ⚠️ Connectivity Rules (MANDATORY – read first)
+
+**Do not implement dummy, mock, or fake Firebolt behavior.**  
+All demos and SQL execution must use a **real** connection to Firebolt (Core or Cloud). The app must guide users to set up that connection; it must not offer a "try without connecting" or "demo with sample data" mode that bypasses Firebolt.
+
+| Rule | Meaning |
+|------|--------|
+| **No dummy calls** | Do not stub or mock the Firebolt/SQL API. Every "Run" or "Execute" must call a real backend that talks to Firebolt. |
+| **No fake metrics** | Query time, rows scanned, bytes read must come from real query execution. No hardcoded or random numbers. |
+| **Connection required** | Before running any demo or playground query, the app must require a successful connection (Core or Cloud). If not connected, show the setup flow—do not fall back to fake data. |
+| **Guide to setup** | The primary path is: **help the user connect** (Firebolt Core local or Firebolt Cloud). Use the Connection Setup Wizard (`/setup`) and clear copy for Core vs Cloud (e.g. "No account? Start with Firebolt Core (free, local)."). See **docs/USER_FLOWS.md** for Flow 1 and Flow 1b. |
+| **Errors are real** | If connection or query fails, show the real error and recovery options (retry, fix credentials, switch to Core), not a generic "demo mode" result. |
+
+**Summary for Loveable:** Build the app so that **every metric and every result** comes from a real Firebolt session. Guide users through **Firebolt Core** (localhost, no account) or **Firebolt Cloud** (credentials) until connection succeeds; only then allow demos and SQL execution.
+
+**When starting a Loveable session with this repo:** Tell Loveable to read **docs/LOVEABLE.md** first (this file), then **KNOWLEDGE.md**, **docs/APP_SPEC.md**, **docs/DATA_CONTRACTS.md**, **docs/USER_FLOWS.md**, and **docs/app-manifest.json**. Emphasize: "Do not implement dummy or mock Firebolt—require real connectivity (Firebolt Core or Cloud) and guide the user through the connection setup before any demo or SQL execution."
+
+---
+
 ## 1. What to Read First (in order)
 
 | Order | File | Why |
@@ -30,14 +51,18 @@
 3. **Phase 3+**  
    Training mode, competitive benchmarks, partner portal (see ROADMAP.md "Loveable Build Phases").
 
-## 4. Backend / Firebolt Connection
+## 4. Backend / Firebolt Connection (real connectivity only)
 
-- The **frontend** needs an API that executes SQL and returns results + metrics (execution time, rows read, etc.).
-- **Options:**  
-  - **A)** You build a small backend (Node or Python) that uses the Firebolt SDK/REST API, and the app calls your backend.  
-  - **B)** You use a serverless API (e.g. Vercel/Netlify function) that wraps Firebolt.  
-- **Data contracts** for requests/responses: see **docs/DATA_CONTRACTS.md** (e.g. `ExecuteSQLRequest`, `ExecuteSQLResponse`, `QueryMetrics`).
-- **Auth:** For Firebolt Cloud, credentials (client ID, secret, account, engine) are entered in the setup wizard and sent to your backend only; never store them in the frontend.
+- The **frontend** must call a **real** backend that connects to Firebolt (Core or Cloud). No mock or dummy implementation of SQL execution.
+- **Backend options:**  
+  - **A)** Small backend (Node or Python) using the Firebolt SDK/REST API; app calls this backend for all SQL and connection tests.  
+  - **B)** Serverless API (e.g. Vercel/Netlify function) that wraps Firebolt.  
+- **Connection parameters:**  
+  - **Firebolt Core (local):** host (e.g. `http://localhost:3473`), no client ID/secret.  
+  - **Firebolt Cloud:** client ID, client secret, account name, engine/database (and optionally database name).  
+- **Flow:** User completes Setup Wizard → Test Connection (real check against Firebolt) → only when successful, enable "Run Demo" / "Run Query". If Test Connection fails, show error and help (e.g. "Switch to Firebolt Core" or fix credentials); do not offer a fallback that skips connection.
+- **Data contracts:** see **docs/DATA_CONTRACTS.md** (`ExecuteSQLRequest`, `ExecuteSQLResponse`, `QueryMetrics`). All metrics must come from actual execution.
+- **Auth:** Cloud credentials are entered in the setup wizard and sent to the backend only; never store them in the frontend or in client-side code.
 
 ## 5. Verticals and Features (data-driven)
 
@@ -54,12 +79,12 @@
 
 ## 7. Starter Prompts for Loveable
 
-Copy-paste these to build incrementally:
+Copy-paste these to build incrementally. **Remember: no dummy/mock Firebolt—all execution and metrics must use a real connection (see Connectivity Rules above).**
 
-1. "Using KNOWLEDGE.md and docs/APP_SPEC.md, create the home page with runtime selection (Core vs Cloud) and vertical selection grid. Use docs/app-manifest.json for the list of verticals. Apply Firebolt design system: #F72A30 primary, Poppins headings, Inter body."
-2. "Add the connection setup wizard (multi-step). Steps: (1) Confirm runtime, (2) Connection details – Core: host/port, Cloud: client ID, secret, account, engine, (3) Test connection, (4) Database setup. Use docs/USER_FLOWS.md for flow."
-3. "Build the Feature Demo Runner page: two cards (Baseline vs Optimized), each with Query Time, Rows Scanned, Bytes Read and improvement %. Add SQL viewer and Run Baseline / Run Optimized buttons. Use docs/DATA_CONTRACTS.md for BenchmarkResult and QueryMetrics."
-4. "Add the SQL Playground page: editor (dark theme #1A0404, Roboto Mono), Run button, results table, execution time, schema browser. Use DATA_CONTRACTS for QueryResult and EditorState."
+1. "Using KNOWLEDGE.md and docs/APP_SPEC.md, create the home page with runtime selection (Core vs Cloud) and vertical selection grid. Use docs/app-manifest.json for the list of verticals. Apply Firebolt design system: #F72A30 primary, Poppins headings, Inter body. Do not add a 'try without connecting' or mock mode—users must choose Core or Cloud and complete setup."
+2. "Add the connection setup wizard (multi-step). Steps: (1) Confirm runtime (Core or Cloud), (2) Connection details – Core: host URL (e.g. localhost:3473), Cloud: client ID, secret, account, engine, (3) Test connection (real call to Firebolt—no stub), (4) Database setup. Use docs/USER_FLOWS.md. If connection fails, show the error and offer 'Switch to Firebolt Core' or fix credentials; never fall back to fake data."
+3. "Build the Feature Demo Runner page: two cards (Baseline vs Optimized), each with Query Time, Rows Scanned, Bytes Read and improvement %. Add SQL viewer and Run Baseline / Run Optimized buttons. Use docs/DATA_CONTRACTS.md for BenchmarkResult and QueryMetrics. Require an established Firebolt connection before allowing Run; metrics must come from real query execution, not mocks."
+4. "Add the SQL Playground page: editor (dark theme #1A0404, Roboto Mono), Run button, results table, execution time, schema browser. Use DATA_CONTRACTS for QueryResult and EditorState. Run must call the real backend/Firebolt; disable Run or show 'Connect first' until connection is successful."
 
 ## 8. File Reference
 
