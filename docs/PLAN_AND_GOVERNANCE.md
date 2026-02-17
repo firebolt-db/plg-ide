@@ -77,12 +77,12 @@ When you add a **new vertical**, **new feature demo**, or **new comparison scrip
 
 | Requirement | Action |
 |-------------|--------|
-| New vertical | Add a `demo_comparison.sql` that follows §2.3 (impact first, comments, demo_progress). Reuse the same step IDs pattern (1–5) and Setup/Cleanup structure. |
-| New feature (e.g. partitioning, late materialization) | If it has a before/after comparison, use the same pattern: impact first, per-step comments, demo_progress. Do not introduce a different flow (e.g. "slow first" or no progress table). |
+| New vertical | Add a `demo_comparison.sql` that follows §2.3 (impact first, comments, demo_progress). Reuse the same step IDs pattern (1–5) and Setup/Cleanup structure. **Update `docs/app-manifest.json`** with the new vertical (id, name, description, dataset, database, tables, furtherReading, features[]). |
+| New feature (e.g. partitioning, late materialization) | If it has a before/after comparison, use the same pattern: impact first, per-step comments, demo_progress. Do not introduce a different flow (e.g. "slow first" or no progress table). **Update `docs/app-manifest.json`** – add the feature to the relevant vertical's `features` array (or to `features_global` if applicable). |
 | New app page or flow | Ensure it respects §2.1 (real connectivity) and §2.2 (confirm target before any write). Do not add a path that bypasses target confirmation. |
 | Loveable / web app | Follow docs/LOVEABLE.md and docs/APP_SPEC.md. The plan in this file applies to the app as well; do not implement an alternative that drops connectivity rules or confirm-target. |
 
-**Checklist before merging:** Does the new capability use real Firebolt only? Does it require user confirmation of account/engine/database before writes? If it's a comparison demo, does it use impact-first order, per-step comments, and demo_progress?
+**Checklist before merging:** Does the new capability use real Firebolt only? Does it require user confirmation of account/engine/database before writes? If it's a comparison demo, does it use impact-first order, per-step comments, and demo_progress? **Is `docs/app-manifest.json` updated so the IDE and Loveable app both see the new vertical or feature?**
 
 ---
 

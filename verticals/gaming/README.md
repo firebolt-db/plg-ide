@@ -46,11 +46,16 @@ python benchmark.py
 
 Demonstrates 50-100X query speedup for:
 
-- **Leaderboards**: Tournament rankings in milliseconds
-- **DAU/MAU**: Daily active player counts
-- **Player Profiles**: Historical player statistics
+| Index | Use Case | Query Pattern |
+|-------|----------|---------------|
+| `playstats_leaderboard_agg` | Tournament rankings | GROUP BY tournament, game, player |
+| `playstats_daily_agg` | DAU/MAU, engagement trends | GROUP BY game, day |
+| `playstats_player_agg` | Player profiles, history | GROUP BY player, game |
+| `playstats_tournament_agg` | Tournament stats | GROUP BY tournament, game |
 
 [Go to Demo](features/aggregating_indexes/)
+
+For full-stack demo (REST API, data streamer, Kafka): see [firebolt-analytics/gaming-demo](https://github.com/firebolt-analytics/gaming-demo) (Firex-gaming-demo).
 
 ## Schema
 
@@ -73,3 +78,9 @@ playstats (
 
 - [Lurkit Case Study](https://www.firebolt.io/blog/how-we-serve-data-from-millions-of-gaming-channels-to-50k-customers-using-firebolt) - 10X historical data, 40% cost reduction
 - [Ultra Fast Gaming Dataset](https://www.firebolt.io/free-sample-datasets/ultra-fast-gaming)
+
+**Further reading (feature demos):**
+
+- [Firebolt docs: Aggregating indexes](https://docs.firebolt.io/sql-reference/aggregating-indexes) — leaderboards, DAU/MAU
+- [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data) — live events, streaming ingestion
+- [firebolt-analytics/gaming-demo](https://github.com/firebolt-analytics/gaming-demo) — full-stack demo (REST API, data streamer, Kafka)

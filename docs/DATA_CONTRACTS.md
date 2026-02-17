@@ -40,6 +40,12 @@ interface ConnectionStatus {
 ## Verticals & Features
 
 ```typescript
+// Link for "Further reading" (engineering blogs, Firebolt docs) — shown alongside demos
+interface FurtherReadingLink {
+  label: string;                 // e.g., 'Late Materialization: Top-K 30x Faster'
+  url: string;                   // Full URL to blog or docs
+}
+
 // Industry vertical
 interface Vertical {
   id: string;                    // e.g., 'gaming', 'ecommerce'
@@ -47,6 +53,7 @@ interface Vertical {
   description: string;           // Short description
   icon: string;                  // Icon name or URL
   dataset: DatasetInfo;
+  furtherReading?: FurtherReadingLink[];  // From app-manifest.json; display on Vertical Overview and Feature Demo Runner
   features: FeatureRef[];
   status: 'available' | 'coming_soon';
 }

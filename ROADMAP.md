@@ -5,21 +5,22 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 ## Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              plg-ide Matrix                                  │
-├─────────────────┬───────────────────────────────────────────────────────────┤
-│                 │                     FEATURES                               │
-│    VERTICALS    ├───────────┬─────────────┬────────────┬───────────┬────────┤
-│                 │ Agg Index │ Late Mat    │ Vector     │ High      │ Stream │
-│                 │           │             │ Search     │ Concur    │ Ingest │
-├─────────────────┼───────────┼─────────────┼────────────┼───────────┼────────┤
-│ Gaming          │    ✓      │             │            │           │        │
-│ E-commerce      │    ✓      │             │            │           │        │
-│ AdTech          │    ✓      │             │            │           │        │
-│ Observability   │    ✓      │             │            │           │        │
-│ Financial       │    ✓      │             │            │           │        │
-│ CyberTech       │   (TBD)   │             │            │           │        │
-└─────────────────┴───────────┴─────────────┴────────────┴───────────┴────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                                 plg-ide Matrix                                        │
+├─────────────────┬───────────────────────────────────────────────────────────────────┤
+│                 │                           FEATURES                                 │
+│    VERTICALS    ├───────────┬─────────────┬────────────┬───────────┬───────┬────────┤
+│                 │ Agg Index │ Late Mat    │ Vector     │ High      │ Event │ Stream │
+│                 │           │             │ Search     │ Concur    │ Stream│ Ingest │
+├─────────────────┼───────────┼─────────────┼────────────┼───────────┼───────┼────────┤
+│ Gaming          │    ✓      │             │            │           │       │  (1)   │
+│ E-commerce      │    ✓      │    (1)      │    (1)     │           │       │        │
+│ AdTech          │    ✓      │             │            │    (1)    │  (1)  │        │
+│ Observability   │    ✓      │    (1)      │    (1)     │           │       │  (1)   │
+│ Financial       │    ✓      │             │    (1)     │           │       │        │
+│ CyberTech       │    ✓      │             │            │           │       │        │
+└─────────────────┴───────────┴─────────────┴────────────┴───────────┴───────┴────────┘
+(1) = blog-driven demo priority per Firebolt Blog–Driven Feature Demos section
 ```
 
 ---
@@ -61,7 +62,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 ### ✅ AdTech (DONE)
 
 **Dataset**: Custom (based on Similarweb/Bigabid patterns)  
-**Case Studies**: Similarweb (100 QPS, 1PB), Bigabid (400X faster, 77% storage savings)
+**Case Studies**: Similarweb (100 QPS, 1PB), Bigabid (400X faster, 77% storage savings). **Blog reference**: [Eliminating OLTP vs OLAP Trade-off](https://www.firebolt.io/blog/eliminating-the-oltp-vs-olap-trade-off) (MerchJar/Amazon ads).
 
 | Use Case | Query Pattern | Best Feature |
 |----------|---------------|--------------|
@@ -77,7 +78,7 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 ### ✅ Observability / Logs (DONE)
 
 **Dataset**: Custom (based on TLDCRM pattern)  
-**Case Studies**: TLDCRM (replaced DataDog, 8M requests/day)
+**Case Studies**: TLDCRM (replaced DataDog, 8M requests/day). **Blog reference**: [Where Do I Put My Logs?](https://www.firebolt.io/blog/where-do-i-put-my-logs) (TLDCRM).
 
 | Use Case | Query Pattern | Best Feature |
 |----------|---------------|--------------|
@@ -106,12 +107,18 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 
 ---
 
-### 🔲 CyberTech (Placeholder)
+### ✅ CyberTech (DONE)
 
-**Dataset**: TBD  
-**Scope**: Security analytics, threat detection, compliance.
+**Dataset**: Multi-Cloud Audit Logs (AWS, Azure, GCP)  
+**Scope**: Security analytics, threat detection, anomaly detection across clouds.
 
-**Status**: Placeholder vertical added; dataset, schema, data, and feature demos to be defined in a future release. See `verticals/cybertech/README.md`.
+| Use Case | Query Pattern | Best Feature |
+|----------|---------------|--------------|
+| Anomaly Detection | Hourly delete events per user | Aggregating Indexes |
+| Cross-Cloud Summary | Union of cloud-specific aggregates | Aggregating Indexes |
+| Compliance | Audit trail analytics | Aggregating Indexes |
+
+**Status**: Schema, data loading (load.sql, sample_data.py), aggregating indexes demo, demo_comparison complete.
 
 ---
 
@@ -146,29 +153,36 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 ### 🔲 Late Materialization (NEXT)
 
 **What**: Read only columns needed, defer joins until filtered  
-**Value**: Read 60-90% less data on wide tables  
-**Best Demo Vertical**: E-commerce (wide product tables)
+**Value**: Read 60-90% less data on wide tables (30X faster top-K on wide tables per blog)  
+**Best Demo Verticals**: E-commerce (wide product tables), Observability (logs — "10 slowest API calls")
+
+**Blog references**: [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster), [Pruning with Late Materialization](https://www.firebolt.io/blog/pruning-even-more-data-with-late-materialization)
 
 | Demo Query | Without | With | Improvement |
 |------------|---------|------|-------------|
 | Product lookup | Read all columns | Read 3 columns | 80% less I/O |
 | Customer history | Full join first | Filter then join | 10X faster |
+| Logs: recent errors/slowest calls | Full scan | Sort column + row IDs then fetch | 30X faster |
 
 ---
 
 ### 🔲 Vector Search
 
-**What**: HNSW indexes for semantic similarity  
+**What**: HNSW indexes for semantic similarity (ACID-compliant per blog)  
 **Value**: Enable AI/ML use cases, semantic search  
-**Best Demo Vertical**: E-commerce (recommendations) or Observability (log similarity)
+**Best Demo Verticals**: E-commerce (recommendations), Observability (log similarity / anomaly detection), Financial (fraud patterns)
+
+**Blog references**: [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt), [Building RAG Chatbot with Firebolt](https://www.firebolt.io/blog/building-a-chatbot-with-firebolt-using-retrieval-augmented-generation)
 
 | Demo Query | Description |
 |------------|-------------|
 | Similar products | Find products with similar embeddings |
 | Log clustering | Group similar error messages |
 | Semantic search | Natural language queries |
+| Fraud detection | Transaction pattern similarity |
 
-**Requires**: Embedding generation (Ollama or OpenAI)
+**Requires**: Embedding generation (Ollama or OpenAI).  
+**Firebolt docs**: [Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes) — for HNSW and embedding column definition; RAG blog for end-to-end pipeline.
 
 ---
 
@@ -177,6 +191,9 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 **What**: Multiple engines, workload isolation  
 **Value**: Handle 100+ QPS without degradation  
 **Best Demo Vertical**: AdTech (real-time bidding)
+
+**Blog references**: [Firebolt Unleashed](https://www.firebolt.io/blog/high-efficiency-and-low-cost-concurrency-in-action); case study [Eliminating OLTP vs OLAP Trade-off](https://www.firebolt.io/blog/eliminating-the-oltp-vs-olap-trade-off) (MerchJar/AdTech). FireScale benchmark (link TBD).  
+**Firebolt docs**: [Engines and workload isolation](https://docs.firebolt.io/concepts/engine-concept) — for multi-engine setup and concurrency.
 
 | Demo | Description |
 |------|-------------|
@@ -190,13 +207,106 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 
 **What**: Kafka/CDC integration for real-time data  
 **Value**: Sub-minute data freshness  
-**Best Demo Vertical**: Gaming (live events) or Observability (logs)
+**Best Demo Verticals**: Gaming (live events, leaderboards), Observability (real-time logs)
+
+**Blog references**: [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data). Local reference: Firex-gaming-demo data streamer.
 
 | Demo | Description |
 |------|-------------|
 | Kafka connector | Stream events to Firebolt |
 | CDC integration | Replicate from Postgres |
 | Real-time dashboard | See data appear in seconds |
+
+---
+
+### 🔲 Event Streams (AdTech)
+
+**What**: Aggregating indexes with array columns and lambdas for fact-to-fact patterns (e.g. conversions without impressions).  
+**Value**: Unique demo for click-fraud / attribution; proves Firebolt beyond simple star schemas.  
+**Best Demo Vertical**: AdTech only.
+
+**Blog reference**: [Event Streams in Firebolt](https://www.firebolt.io/blog/event-streams-in-firebolt) (click fraud pattern).
+
+| Demo | Description |
+|------|-------------|
+| Conversions without impressions | nest() + array aggregating index |
+| Session-level event streams | Array columns, lambda aggregations |
+
+**Requires**: AdTech schema extension (e.g. `session_events ARRAY`, nest/lambda in agg index).  
+**Firebolt docs**: [Aggregating indexes](https://docs.firebolt.io/sql-reference/aggregating-indexes), [Working with arrays](https://docs.firebolt.io/sql-reference/data-types#array) — for nest() and array column syntax.
+
+---
+
+### 🔲 Data Lake / Iceberg (Future)
+
+**What**: READ_ICEBERG, sub-second queries on Iceberg tables.  
+**Value**: Data lake use case; 6B-row TPC-H style benchmarks.  
+**Status**: Not yet a PLG IDE vertical; add if Iceberg is strategic.
+
+**Blog references**: [Unlocking Faster Iceberg Queries](https://www.firebolt.io/blog/unlocking-faster-iceberg-queries-the-writer-optimizations-you-are-missing), [Querying Apache Iceberg Sub-Second](https://www.firebolt.io/blog/querying-apache-iceberg-with-sub-second-performance). Local: firebolt-iceberg-demo.
+
+---
+
+## Firebolt Blog–Driven Feature Demos
+
+Evaluation of Firebolt engineering blogs (Feb 2024–Feb 2025) mapped to PLG IDE verticals and implementation order.
+
+### Priority Matrix (Blog → Vertical → Effort)
+
+| Feature | Best vertical(s) | Second | Effort |
+|---------|------------------|--------|--------|
+| Late Materialization | E-commerce, Observability | Financial | Medium (schema tweaks, demo_comparison) |
+| Vector Search | E-commerce, Observability | AdTech, Financial | Medium–High (embeddings, Ollama/local) |
+| Event Streams (arrays + agg index) | AdTech | — | Medium (array columns, nest/lambda) |
+| Streaming Ingestion | Gaming, Observability | AdTech | High (Kafka/Confluent setup) |
+| Iceberg | New Data Lake vertical | — | Medium (public S3 dataset) |
+| Case studies (MerchJar, TLDCRM) | AdTech, Observability | — | Low (README/talking points) |
+
+### Implementation order (blog-aligned)
+
+1. **Late Materialization** — E-commerce and Observability first; align with firebolt-late-materialization-demo.
+2. **Vector Search** — E-commerce (recommendations) and Observability (log similarity); use vector-search-index-demo and RAG blog patterns.
+3. **Event Streams (AdTech)** — Port click-fraud pattern from Event Streams blog; extend AdTech schema with array columns and nest() aggregating index.
+4. **Streaming Ingestion** — Start with Gaming; reference Firex-gaming-demo and Confluent connector blog.
+5. **Iceberg** — Add as new vertical or global feature if strategic; use firebolt-iceberg-demo.
+6. **Case studies** — Add MerchJar and TLDCRM as references in AdTech and Observability READMEs.
+
+### Schema changes required (summary)
+
+| Vertical | Late Mat | Vector Search | Event Streams |
+|----------|----------|---------------|---------------|
+| E-commerce | products wide TEXT/JSON | embedding or product_embeddings | — |
+| Observability | debug_trace/wide column on logs | embedding or log_embeddings | — |
+| AdTech | — | Optional | session_events ARRAY, nest() |
+| Gaming | Optional wide columns | — | — |
+| Financial | Optional transaction_details | Embeddings for fraud | — |
+
+### Reference implementations (repos)
+
+Use these for query patterns, schema, and runnable examples when building the next demos in plg-ide:
+
+| Feature | Repo / reference | URL |
+|---------|------------------|-----|
+| Streaming (Gaming) | Firex-gaming-demo | [firebolt-analytics/gaming-demo](https://github.com/firebolt-analytics/gaming-demo) |
+| Late Materialization | firebolt-late-materialization-demo | TBD (align with Product-Late-Materialisation demo pattern) |
+| Vector Search | vector-search-index-demo | TBD |
+| Iceberg | firebolt-iceberg-demo | TBD |
+
+Add URLs above when repos are available. See also vertical READMEs (e.g. [verticals/gaming/README.md](verticals/gaming/README.md)) for vertical-specific references.
+
+### Next demos: plg-ide paths
+
+Create feature demos under these directories so the repo stays consistent with existing aggregating-index demos:
+
+| Feature | First vertical(s) | Path(s) to add |
+|---------|-------------------|-----------------|
+| Late Materialization | E-commerce, Observability | `verticals/ecommerce/features/late_materialization/` (01_baseline, 02_create, 03_optimized, demo_comparison), same under `verticals/observability/` |
+| Vector Search | E-commerce, Observability | `verticals/ecommerce/features/vector_search/`, `verticals/observability/features/vector_search/` |
+| Event Streams | AdTech | `verticals/adtech/features/event_streams/` (schema change in `verticals/adtech/schema/` first) |
+| Streaming Ingestion | Gaming, Observability | `verticals/gaming/features/streaming_ingestion/`, `verticals/observability/features/streaming_ingestion/` (or doc + link to Confluent connector) |
+| Iceberg | New vertical | `verticals/datalake/` or global feature; schema + READ_ICEBERG load |
+
+Follow the pattern in [Adding a New Feature](#adding-a-new-feature): baseline SQL, setup/index SQL, optimized SQL, and benchmark or demo_comparison where applicable.
 
 ---
 
@@ -377,10 +487,12 @@ For each comparison demo:
 - [x] Financial vertical (schema, data, aggregating indexes demo)
 - [ ] Late materialization demos
 
-### Phase 3: Advanced Features
-- [ ] Vector search demos
-- [ ] High concurrency demos
-- [ ] Streaming ingestion demos
+### Phase 3: Advanced Features (blog-driven order)
+- [ ] Vector search demos (E-commerce, Observability; reference vector-search-index-demo)
+- [ ] Event Streams demo (AdTech: click-fraud pattern, array agg index)
+- [ ] High concurrency demos (AdTech)
+- [ ] Streaming ingestion demos (Gaming, Observability; Confluent connector)
+- [ ] Iceberg / Data Lake vertical (optional; firebolt-iceberg-demo)
 
 ### Phase 4: Competitive Benchmarks (Loveable App)
 - [ ] SQL Playground with side-by-side ClickHouse comparison
@@ -467,16 +579,18 @@ Use these prompts to build incrementally:
 2. Create `verticals/{name}/schema/01_tables.sql`
 3. Create `verticals/{name}/data/load.sql` (S3 COPY or sample generator)
 4. Add feature demos in `verticals/{name}/features/{feature}/`
-5. Update this roadmap
+5. **Update `docs/app-manifest.json`** – add the new vertical (id, name, description, dataset, database, tables, rowCount, furtherReading, features). The IDE and Loveable app use the manifest as the single source of truth; without this step they will not show the new vertical.
+6. Update this roadmap (ROADMAP.md)
 
 ## Adding a New Feature
 
 1. Create `features/{name}/README.md` with feature explanation
 2. Identify best vertical to showcase the feature
 3. Create demo in `verticals/{vertical}/features/{name}/`
-4. Add baseline, setup, optimized SQL files
-5. Create benchmark.py for automated comparison
-6. Update this roadmap
+4. Add baseline, setup, optimized SQL files (e.g. 01_baseline.sql, 02_create_indexes.sql, 03_optimized.sql)
+5. Create benchmark.py for automated comparison (if applicable)
+6. **Update `docs/app-manifest.json`** – add the feature to the relevant vertical's `features` array (id, name, description, status: `available` or `coming_soon`). Add to `features_global` if it is a cross-vertical feature. Without this step the IDE and Loveable app will not show the new feature.
+7. Update this roadmap (ROADMAP.md)
 
 ---
 
@@ -488,6 +602,18 @@ Use these prompts to build incrementally:
 - [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server)
 - [Firebolt Documentation](https://docs.firebolt.io/)
 - [Firebolt Core (Docker)](https://github.com/firebolt-db/firebolt-core)
+
+### Firebolt Engineering Blogs (Feature Demo Sources)
+- [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster)
+- [Pruning with Late Materialization](https://www.firebolt.io/blog/pruning-even-more-data-with-late-materialization)
+- [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt)
+- [Building RAG Chatbot with Firebolt](https://www.firebolt.io/blog/building-a-chatbot-with-firebolt-using-retrieval-augmented-generation)
+- [Event Streams in Firebolt](https://www.firebolt.io/blog/event-streams-in-firebolt)
+- [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data)
+- [Unlocking Faster Iceberg Queries](https://www.firebolt.io/blog/unlocking-faster-iceberg-queries-the-writer-optimizations-you-are-missing)
+- [Querying Apache Iceberg Sub-Second](https://www.firebolt.io/blog/querying-apache-iceberg-with-sub-second-performance)
+- [Eliminating OLTP vs OLAP Trade-off](https://www.firebolt.io/blog/eliminating-the-oltp-vs-olap-trade-off) (MerchJar)
+- [Where Do I Put My Logs?](https://www.firebolt.io/blog/where-do-i-put-my-logs) (TLDCRM)
 
 ### Competitive Targets: ClickHouse Demos
 These are the demos we will beat with Firebolt equivalents:

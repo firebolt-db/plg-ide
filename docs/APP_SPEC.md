@@ -5,6 +5,8 @@
 > **For Loveable:** Use `docs/app-manifest.json` for the list of verticals and their features (Gaming, E-commerce, AdTech, Observability, Financial, CyberTech). Use `docs/LOVEABLE.md` as the build entry point.
 >
 > **Connectivity:** The app must not use dummy or mock Firebolt calls. All SQL execution and metrics require a real connection to Firebolt Core or Firebolt Cloud. Guide users through the Setup Wizard to establish connection; see **docs/LOVEABLE.md** (§ Connectivity Rules).
+>
+> **Experience parity:** The app must offer the same conceptual steps as the IDE experience: connection → confirm target → vertical selection → feature selection → run SQL → show metrics and explain. See **docs/LOVEABLE.md** (§ Experience parity with the IDE).
 
 ## Page Structure
 
@@ -131,6 +133,11 @@
 │  │  └────────────────────────────────────────────┘ │   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  Further reading                                │   │
+│  │  • Lurkit Case Study →  • Aggregating indexes → │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -181,6 +188,12 @@
 │  │  [▼] EXPLAIN ANALYZE Output                      │   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  Further reading                                 │   │
+│  │  • Late Materialization: Top-K 30x Faster →     │   │
+│  │  • Firebolt docs: Aggregating indexes →         │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -203,6 +216,9 @@ For each `vertical` and `feature` in the app manifest, the backend/API should se
 - Baseline: `verticals/{vertical}/features/{feature}/01_baseline.sql`
 - Optimized: `verticals/{vertical}/features/{feature}/03_optimized.sql`  
 The Feature Demo Runner must always show **both** Baseline and Optimized cards with SQL viewer and Run buttons, and load this content by vertical+feature (e.g. `ecommerce` + `partitioning`). If a feature has no demo files, show "Demo content coming soon" instead of empty inputs.
+
+**Further reading (alongside the demo):**  
+Display a **Further reading** block on this page (and on the Vertical Overview page) using links from `app-manifest.json` → `verticals[].furtherReading`. Each item is `{ "label": "...", "url": "..." }`. These are the engineering blogs and Firebolt docs for this vertical (source of truth: `verticals/{id}/README.md` section "Further reading (feature demos)" and main `README.md` "Further reading"). Show them as a short list of links so users can read more after the demo without leaving the app flow.
 
 ### 5. SQL Playground (`/playground`)
 
@@ -253,7 +269,7 @@ The Feature Demo Runner must always show **both** Baseline and Optimized cards w
 **Components:**
 - FeatureList - Cards linking to feature deep dives
 - SearchBox - Search documentation
-- ExternalLinks - Links to Firebolt docs
+- ExternalLinks - Links to Firebolt docs and engineering blogs (can use same `furtherReading` links as in manifest; see main README.md "Further reading" and ROADMAP.md References for full list)
 
 ### 7. Feature Deep Dive (`/learn/:feature`)
 

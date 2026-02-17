@@ -80,3 +80,9 @@ inventory (product_id, warehouse_id, quantity, last_updated)
 
 - [Vrio Case Study](https://www.firebolt.io/knowledge-center/case-studies) - Query performance + cost reduction
 - [E-commerce Dataset](https://www.firebolt.io/free-sample-datasets/e-commerce) - 52GB, 412M rows
+
+**Further reading (feature demos):**
+
+- [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster) — wide tables, customer 360
+- [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt), [Building RAG Chatbot with Firebolt](https://www.firebolt.io/blog/building-a-chatbot-with-firebolt-using-retrieval-augmented-generation) — recommendations, semantic search
+- [Firebolt docs: Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes)

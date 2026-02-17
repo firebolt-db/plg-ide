@@ -143,62 +143,60 @@ plg-ide/
 └── .cursor/rules/       # This file
 ```
 
+## Vertical and Feature List (Single Source of Truth)
+
+**The list of verticals and their features comes from `docs/app-manifest.json`.** Read that file to discover available verticals and, for each vertical, the list of features (with `status`: `available` or `coming_soon`). Resolve all paths using the vertical and feature **ids** from the manifest:
+
+- Vertical schema: `verticals/{vertical_id}/schema/01_tables.sql`
+- Vertical data load: `verticals/{vertical_id}/data/load.sql` (Cloud/S3) or `verticals/{vertical_id}/data/sample_data.py` (Core)
+- Feature demo SQL: `verticals/{vertical_id}/features/{feature_id}/01_baseline.sql`, `02_create_indexes.sql` (or `02_*.sql`), `verticals/{vertical_id}/features/{feature_id}/03_optimized.sql`
+- Comparison script: `verticals/{vertical_id}/demo_comparison.sql`
+
+If the user does not know which vertical or feature to pick, **suggest Gaming first** (id `gaming`) and Aggregating Indexes (id `aggregating_indexes`) as the default demo.
+
 ## Guided Demo Flow
 
 After MCP is configured and connected, guide users through demos.
 
-### Step 1: Determine Interest
+### Step 1: Choose Vertical (and Feature)
 
-Ask the user what they want to explore:
-
-| User Interest | Recommended Demo |
-|---------------|------------------|
-| "performance" / "speed" / "fast queries" | Gaming > Aggregating Indexes |
-| "gaming" / "leaderboards" / "analytics" | Gaming Vertical |
-| "real-time" / "dashboards" | Gaming > DAU/Leaderboard queries |
-| "cost" / "efficiency" | Aggregating Indexes (less data = lower cost) |
+1. **Read `docs/app-manifest.json`** to get the list of verticals (each with `id`, `name`, `description`, `features[]`).
+2. **Ask the user which vertical they want to explore** (e.g. Gaming, E-commerce, AdTech, Observability, Financial, CyberTech). Offer the list from the manifest; if they are unsure, suggest **Gaming** first.
+3. **For the chosen vertical, ask which feature** they want (from that vertical's `features` in the manifest). Only run demos for features with `status: "available"`. If they pick a feature with `status: "coming_soon"`, say the demo is not yet available and suggest an available feature (e.g. Aggregating Indexes).
+4. **Resolve paths** using the vertical `id` and feature `id`: e.g. `verticals/gaming/...`, `verticals/ecommerce/features/partitioning/...`.
 
 ### Step 2: Set Up Demo Data
 
-Using MCP tools, help them set up the gaming demo:
+Using MCP tools, help them set up the chosen vertical's demo:
 
 1. **Create database** (if needed):
    ```sql
    CREATE DATABASE IF NOT EXISTS plg_demo;
    ```
 
-2. **Create tables** - Read `verticals/gaming/schema/01_tables.sql` and execute via `firebolt_query`
+2. **Create tables** – Read `verticals/{vertical_id}/schema/01_tables.sql` and execute via `firebolt_query`.
 
 3. **Load data**:
-   - For **Cloud**: Use S3 COPY from `verticals/gaming/data/load.sql`
-   - For **Core**: Generate sample data or use smaller INSERT statements
+   - For **Cloud**: Use S3 COPY from `verticals/{vertical_id}/data/load.sql`
+   - For **Core**: Use `verticals/{vertical_id}/data/sample_data.py` if present, or smaller INSERT statements
 
-### Step 3: Run the Aggregating Indexes Demo
+### Step 3: Run the Feature Demo
 
-This is the flagship demo - proves 50-100X query improvement:
+For the chosen vertical and feature (e.g. aggregating_indexes, partitioning):
 
-1. **Run baseline query** (WITHOUT indexes):
-   - Read query from `verticals/gaming/features/aggregating_indexes/01_baseline.sql`
-   - Execute via `firebolt_query`
-   - Note the execution time
+1. **Run baseline** (without the feature): Read `verticals/{vertical_id}/features/{feature_id}/01_baseline.sql`, execute via `firebolt_query`, note execution time.
+2. **Create or enable the feature**: If the feature has a `02_create_indexes.sql` or `02_*.sql`, read and execute it via `firebolt_query`; explain what is being created.
+3. **Run optimized** (with the feature): Read `verticals/{vertical_id}/features/{feature_id}/03_optimized.sql`, execute via `firebolt_query`, note execution time.
+4. **Show the comparison** (time, rows scanned, bytes read if available) and calculate improvement.
 
-2. **Create aggregating indexes**:
-   - Read from `verticals/gaming/features/aggregating_indexes/02_create_indexes.sql`
-   - Execute via `firebolt_query`
-   - Explain what indexes are being created
+### Step 4: Explain Results and Why It's Differentiating
 
-3. **Run optimized query** (WITH indexes):
-   - Execute the same query again
-   - Note the new execution time
-   - Calculate and show the improvement
+After running the demo:
 
-4. **Explain the results**:
-   - What happened: Indexes pre-computed aggregations at write time
-   - Why it's faster: Queries read small index instead of scanning millions of rows
-   - When to use: Dashboards, APIs, repeated analytics patterns
-   - Trade-off: Slightly slower writes, much faster reads
+1. **Explain the results**: What the feature does, why the query is faster, when to use it, trade-offs.
+2. **Use MCP to explain why it's differentiating**: Call `firebolt_docs_search` (e.g. search for the feature name or "Firebolt vs" / "performance") and briefly summarize why this capability is differentiating compared to other data warehouses or engines. Keep it to one or two sentences unless the user asks for more.
 
-### Step 4: Next Steps
+### Step 5: Next Steps
 
 After the demo, offer:
 
@@ -217,13 +215,15 @@ Proactively search documentation to support explanations:
 
 ## Common Tasks
 
-### "Set up the gaming demo"
+Use `docs/app-manifest.json` to get vertical and feature ids; paths are `verticals/{vertical_id}/...` and `verticals/{vertical_id}/features/{feature_id}/...`. Example with Gaming:
+
+### "Set up the gaming demo" (or any vertical)
 
 ```bash
 # 1. Copy environment config
 cp config/core.env.example .env  # or cloud.env.example
 
-# 2. Create tables
+# 2. Create tables (replace gaming with chosen vertical_id)
 python -m lib.firebolt run verticals/gaming/schema/01_tables.sql
 
 # 3. Load data (Cloud with S3 access)
@@ -233,7 +233,7 @@ python -m lib.firebolt run verticals/gaming/data/load.sql
 python verticals/gaming/data/sample_data.py
 ```
 
-### "Show me the aggregating indexes demo"
+### "Show me the aggregating indexes demo" (or any feature)
 
 ```bash
 cd verticals/gaming/features/aggregating_indexes
@@ -291,6 +291,7 @@ When helping users:
 - `docs/MCP_SETUP.md` - Firebolt MCP server setup; check if running, install locally (Docker/binary), [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server)
 - `docs/APP_SPEC.md` - App pages and Setup Wizard (including target confirmation step)
 - `lib/firebolt.py` - Runtime abstraction (understand the code)
-- `verticals/gaming/README.md` - Gaming vertical details
+- **`docs/app-manifest.json`** - **Single source of truth for verticals and features.** Use this to list verticals and their features; resolve paths as `verticals/{vertical_id}/...` and `verticals/{vertical_id}/features/{feature_id}/...`.
+- `verticals/{vertical_id}/README.md` - Vertical details (e.g. verticals/gaming/README.md)
 - `verticals/*/demo_comparison.sql` - Canonical demo pattern (impact first, comments, demo_progress)
 - `features/aggregating_indexes/README.md` - Cross-vertical feature docs

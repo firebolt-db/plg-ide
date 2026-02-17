@@ -9,6 +9,12 @@
 
 Experience Firebolt's value through interactive, feature-by-feature demonstrations in your IDE.
 
+## How to use this repo
+
+- **Use in your IDE** — Follow the Quick Start below, open this repo in Cursor (or another MCP-capable IDE), and ask **"Help me get started with Firebolt"**. You’ll be guided through runtime setup, then to pick a vertical and feature and run demos with real SQL and metrics.
+- **Build the web app (Loveable)** — Clone this repo and use it as context for [Loveable](https://loveable.dev) to build the plg-ide web application. Start with **[docs/LOVEABLE.md](docs/LOVEABLE.md)**; it defines the read order (PLAN_AND_GOVERNANCE, KNOWLEDGE, APP_SPEC, DATA_CONTRACTS, USER_FLOWS, app-manifest) and connectivity rules. The app will offer the same exploratory stepped experience as the IDE (connection → confirm target → vertical → feature → run SQL → show metrics and explain).
+- **Add a vertical or capability** — Follow **[docs/PLAN_AND_GOVERNANCE.md](docs/PLAN_AND_GOVERNANCE.md)** and the "Adding a New Vertical" / "Adding a New Feature" sections in [ROADMAP.md](ROADMAP.md). You **must** update **[docs/app-manifest.json](docs/app-manifest.json)** when adding verticals or features so the IDE and Loveable app both see the new content. See **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** for a consolidated checklist. Run `python3 scripts/validate_manifest_structure.py` to verify the repo structure matches the manifest.
+
 ## Quick Start
 
 ### 1. Add Firebolt MCP to Cursor (one click)
@@ -50,7 +56,7 @@ Industry-specific demos with real datasets:
 | [AdTech](verticals/adtech/) | AdTech | Custom | High QPS, campaign analytics, real-time bidding |
 | [Observability](verticals/observability/) | Observability | Custom | Log analytics, metrics aggregation, distributed tracing |
 | [Financial](verticals/financial/) | Financial Services | Custom | Transaction analytics, risk scoring, regulatory reporting |
-| [CyberTech](verticals/cybertech/) | TBD | TBD | Security analytics, threat detection, compliance (placeholder) |
+| [CyberTech](verticals/cybertech/) | Multi-Cloud Audit Logs | ~300K events | Security analytics, threat detection, multi-cloud anomaly detection |
 
 ### Features
 
@@ -144,6 +150,17 @@ See [ROADMAP.md](ROADMAP.md) for planned verticals and features:
 | ✅ AdTech | 🔲 Vector Search |
 | ✅ Observability | 🔲 High Concurrency |
 | ✅ Financial | 🔲 Streaming Ingestion |
+
+## Further reading (after the demo)
+
+Engineering blogs and Firebolt docs that back the demos — use these when presenting "learn more" to users:
+
+- **Aggregating Indexes**: [Firebolt docs: Aggregating indexes](https://docs.firebolt.io/sql-reference/aggregating-indexes)
+- **Late Materialization**: [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster), [Pruning with Late Materialization](https://www.firebolt.io/blog/pruning-even-more-data-with-late-materialization)
+- **Vector Search**: [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt), [Building RAG Chatbot with Firebolt](https://www.firebolt.io/blog/building-a-chatbot-with-firebolt-using-retrieval-augmented-generation), [Firebolt docs: Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes)
+- **Streaming**: [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data)
+- **Event Streams (AdTech)**: [Event Streams in Firebolt](https://www.firebolt.io/blog/event-streams-in-firebolt)
+- **Full list**: [ROADMAP.md – References / Firebolt Engineering Blogs](ROADMAP.md#firebolt-engineering-blogs-feature-demo-sources)
 
 ## License
 

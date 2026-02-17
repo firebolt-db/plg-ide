@@ -82,3 +82,9 @@ conversions (conversion_id, click_id, value, timestamp, ...)
 
 - [Similarweb Case Study](https://www.firebolt.io/knowledge-center/case-studies) - 100 QPS, 1PB data
 - [Bigabid Case Study](https://www.firebolt.io/knowledge-center/case-studies) - 400X faster, 77% storage savings
+
+**Further reading (feature demos):**
+
+- [Eliminating OLTP vs OLAP Trade-off](https://www.firebolt.io/blog/eliminating-the-oltp-vs-olap-trade-off) (MerchJar/Amazon ads) — high concurrency, AdTech
+- [Event Streams in Firebolt](https://www.firebolt.io/blog/event-streams-in-firebolt) — click fraud, array aggregating indexes
+- [Firebolt docs: Aggregating indexes](https://docs.firebolt.io/sql-reference/aggregating-indexes), [Working with arrays](https://docs.firebolt.io/sql-reference/data-types#array)

@@ -85,3 +85,11 @@ traces (
 ## Real-World References
 
 - [TLDCRM Case Study](https://www.firebolt.io/knowledge-center/case-studies) - Replaced DataDog, 8M requests/day
+- [Where Do I Put My Logs?](https://www.firebolt.io/blog/where-do-i-put-my-logs) (TLDCRM) — observability at scale
+
+**Further reading (feature demos):**
+
+- [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster) — "10 slowest API calls", log analytics
+- [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt) — log similarity, anomaly detection
+- [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data) — real-time logs
+- [Firebolt docs: Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes)

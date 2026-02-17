@@ -80,3 +80,9 @@ portfolios (portfolio_id, customer_id, holdings JSON)
 
 - [Primer Case Study](https://www.firebolt.io/knowledge-center/case-studies) - Millisecond latency
 - [Ezora Case Study](https://www.firebolt.io/knowledge-center/case-studies) - 30X faster queries
+
+**Further reading (feature demos):**
+
+- [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt) — fraud detection, pattern similarity
+- [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster) — wide transaction tables
+- [Firebolt docs: Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes)

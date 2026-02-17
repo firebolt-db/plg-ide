@@ -42,6 +42,19 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 - **Users:** Sales engineers (demos), developers (evaluation), partners (training).
 - **Principle:** Every demo shows measurable improvement (e.g. "50–100X faster with aggregating indexes").
 
+### Experience parity with the IDE
+
+The Loveable app **must offer the same conceptual steps** as the IDE-guided experience, so users get a consistent exploratory flow in either channel:
+
+1. **Connection** – Select runtime (Core or Cloud), enter connection details, test connection.
+2. **Confirm target** – Show account (or host), engine, and database; get explicit user confirmation before any create or write.
+3. **Vertical selection** – User chooses an industry vertical from the manifest (e.g. Gaming, E-commerce).
+4. **Feature selection** – User chooses a feature demo for that vertical (e.g. Aggregating Indexes).
+5. **Run SQL and show metrics** – Run baseline and optimized queries; display real metrics (query time, rows scanned, bytes read) and improvement.
+6. **Explain** – Surface brief explanation of what the feature does and why it is differentiating (e.g. links to further reading from the manifest).
+
+Do not add flows that skip target confirmation, use mock data, or reorder these steps in a way that diverges from the IDE experience.
+
 ## 3. Build Order (recommended)
 
 1. **Phase 1 – Core demo runner**  
@@ -69,7 +82,8 @@ All demos and SQL execution must use a **real** connection to Firebolt (Core or 
 ## 5. Verticals and Features (data-driven)
 
 - Use **docs/app-manifest.json** for the list of verticals and their features.
-- Each vertical has: `id`, `name`, `description`, `dataset`, `database`, `features[]`.
+- Each vertical has: `id`, `name`, `description`, `dataset`, `database`, `furtherReading[]`, `features[]`.
+- Each vertical's **furtherReading** is an array of `{ "label": "...", "url": "..." }` — engineering blogs and Firebolt docs. **Display these alongside the demo** on the Vertical Overview page and on the Feature Demo Runner page so users can click through to "learn more" after running a demo. See **docs/APP_SPEC.md** (Further reading block).
 - Each feature has: `id`, `name`, `description`, `status` (`available` | `coming_soon`). This drives the vertical overview and feature demo list.
 
 ## 6. Design Rules (from KNOWLEDGE.md)

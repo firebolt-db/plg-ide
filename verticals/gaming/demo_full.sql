@@ -49,7 +49,9 @@
 -- │                                                                             │
 -- │  THE MAGIC (Stage 4):                                                       │
 -- │  "Now we create aggregating indexes. This is ONE LINE of SQL that tells    │
--- │   Firebolt: 'I care about these aggregations - pre-compute them for me.'"  │
+-- │   Firebolt: 'I care about these aggregations - pre-compute them for me.'  │
+-- │   We create four indexes: leaderboards, DAU/MAU daily metrics, player     │
+-- │   profiles, and tournament stats. Each accelerates different query types."│
 -- │                                                                             │
 -- │  THE PAYOFF (Stage 5):                                                      │
 -- │  "Same queries. Same data. But now look at the timing - 50-100X faster.    │
@@ -569,11 +571,12 @@ ON playstats (
 
 -- -----------------------------------------------------------------------------
 -- INDEX 4: Tournament Stats Index
--- Matches: Tournament overview queries (GROUP BY tournament)
+-- Matches: Tournament overview queries (GROUP BY tournament, game)
 -- -----------------------------------------------------------------------------
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
     tournamentid,
+    gameid,
     AVG(currentscore),
     MAX(currentscore),
     SUM(currentplaytime),
@@ -797,6 +800,7 @@ SELECT '>>> Re-creating index - performance restored! <<<' AS step;
 CREATE AGGREGATING INDEX IF NOT EXISTS playstats_tournament_agg
 ON playstats (
     tournamentid,
+    gameid,
     AVG(currentscore),
     MAX(currentscore),
     SUM(currentplaytime),
