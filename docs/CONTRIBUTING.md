@@ -23,10 +23,11 @@ When adding new verticals or features, follow the steps below so the IDE and Lov
 1. Create or update `features/{name}/README.md` with feature explanation.
 2. Create demo in `verticals/{vertical}/features/{name}/` with 01_baseline.sql, 02_*.sql, 03_optimized.sql (and benchmark.py if applicable).
 3. If the feature has a before/after comparison, follow the demo script pattern in PLAN_AND_GOVERNANCE §2.3 (impact first, demo_progress).
-4. **Update `docs/app-manifest.json`** – add the feature to the relevant vertical's `features` array (id, name, description, status: `available` or `coming_soon`). If it is cross-vertical, also add to `features_global`.
-5. Update `ROADMAP.md`.
+4. **Update `docs/app-manifest.json`** – add the feature to the relevant vertical's `features` array (id, name, description, status: `available` or `coming_soon`). If it is cross-vertical, also add to `features_global`. If the feature depends on a specific Firebolt capability, add optional `minCoreVersion` / `versionNote` (see [FIREBOLT_VERSIONS.md](FIREBOLT_VERSIONS.md)).
+5. If the feature requires a minimum Firebolt Core or Cloud version: check [Firebolt release notes](https://docs.firebolt.io/reference/release-notes) and [release notes archive](https://docs.firebolt.io/reference/release-notes/release-notes-archive), then update [docs/FIREBOLT_VERSIONS.md](FIREBOLT_VERSIONS.md) and the feature’s `features/<id>/README.md`.
+6. Update `ROADMAP.md`.
 
-**Checklist before merging:** Same as above; **app-manifest.json updated** so IDE and Loveable both see the new feature.
+**Checklist before merging:** Same as above; **app-manifest.json updated** so IDE and Loveable both see the new feature. If the feature depends on a specific Firebolt version, **FIREBOLT_VERSIONS.md** and release notes reviewed.
 
 ---
 

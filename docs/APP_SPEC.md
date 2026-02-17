@@ -20,6 +20,22 @@
 /learn/:feature             # Feature Deep Dive
 ```
 
+### Deep links (feature-first entry)
+
+To send a user directly to a specific feature (e.g. for sharing or campaign links), use the canonical URL:
+
+**`/demo/:vertical/:feature`**
+
+Example: `/demo/gaming/automated_column_statistics` opens the Automated Column Statistics demo in the Gaming vertical.
+
+**Behavior:**
+
+- If the user is **not connected:** Show the connection Setup Wizard first; after a successful connection (and confirm target), **redirect** to `/demo/<vertical_id>/<feature_id>` so they land on that feature’s demo runner.
+- If the user **is connected:** Render the Feature Demo Runner for that vertical and feature directly. Provide “Back to vertical” and “Back to home” so they can reach the full flow.
+- If `vertical_id` or `feature_id` is invalid or the feature is not available for that vertical, show a 404 or “Feature not available” and offer navigation to home or the vertical list.
+
+**Optional query params on home (`/`):** Support `?feature=<feature_id>` and optionally `?vertical=<vertical_id>`. On load, if `feature` is set and the user is connected (or after setup), redirect to `/demo/<vertical>/<feature>`. If `vertical` is omitted, resolve the first vertical that has that feature with `status: "available"` from the app manifest, then redirect.
+
 ## Pages
 
 ### 1. Home Page (`/`)

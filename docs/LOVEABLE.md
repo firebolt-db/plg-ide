@@ -55,6 +55,8 @@ The Loveable app **must offer the same conceptual steps** as the IDE-guided expe
 
 Do not add flows that skip target confirmation, use mock data, or reorder these steps in a way that diverges from the IDE experience.
 
+**Shareable feature-first links:** The app supports deep links so users can land directly on one feature. Use the URL `/demo/<vertical_id>/<feature_id>` (e.g. `/demo/gaming/automated_column_statistics`). If the user is not yet connected, complete the Setup Wizard then redirect to this URL. Optionally support `?feature=<id>` and `?vertical=<id>` on the home page and redirect to the corresponding `/demo/:vertical/:feature`. See **docs/APP_SPEC.md** (§ Deep links) and **docs/USER_FLOWS.md** (Flow 2b).
+
 ## 3. Build Order (recommended)
 
 1. **Phase 1 – Core demo runner**  

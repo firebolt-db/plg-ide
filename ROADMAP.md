@@ -23,6 +23,8 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 (1) = blog-driven demo priority per Firebolt Blog–Driven Feature Demos section
 ```
 
+**Automated Column Statistics** (horizontal): Better join ordering from column stats (ndistinct) without query changes. Gaming ✓; other verticals coming. [Firebolt docs](https://docs.firebolt.io/performance-and-observability/query-planning/automated-column-statistics).
+
 ---
 
 ## Verticals
@@ -604,6 +606,7 @@ Use these prompts to build incrementally:
 - [Firebolt Core (Docker)](https://github.com/firebolt-db/firebolt-core)
 
 ### Firebolt Engineering Blogs (Feature Demo Sources)
+- [Firebolt docs: Automated column statistics](https://docs.firebolt.io/performance-and-observability/query-planning/automated-column-statistics) — join ordering, ndistinct, EXPLAIN(STATISTICS). Technical deep dive blog (when published) will be linked here.
 - [Late Materialization: Top-K 30x Faster](https://www.firebolt.io/blog/late-materialization-how-firebolt-makes-top-k-queries-30x-faster)
 - [Pruning with Late Materialization](https://www.firebolt.io/blog/pruning-even-more-data-with-late-materialization)
 - [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt)

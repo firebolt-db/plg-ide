@@ -2,6 +2,10 @@
 
 > TypeScript interfaces for all data shapes used in the plg-ide web application
 
+## Entry URL and deep links (optional)
+
+The app may support **query params** on the home/entry URL for feature-first entry: `?feature=<feature_id>` and optionally `?vertical=<vertical_id>`. If present and the user is connected (or after setup), redirect to `/demo/<vertical>/<feature>`. If `vertical` is omitted, resolve the first vertical that has the feature with `status: "available"` from the app manifest. Canonical deep link: `/demo/:vertical/:feature` (e.g. `/demo/gaming/automated_column_statistics`). See docs/APP_SPEC.md (§ Deep links) and docs/USER_FLOWS.md (Flow 2b).
+
 ## Runtime & Connection
 
 ```typescript
@@ -101,6 +105,9 @@ interface Feature {
   typicalImprovement: string;    // e.g., '10-100x faster'
   documentationUrl?: string;
   applicableVerticals: string[]; // Which verticals support this
+  // Firebolt version requirements (optional; see docs/FIREBOLT_VERSIONS.md)
+  minCoreVersion?: string;       // e.g., 'latest' or a specific Docker image tag
+  versionNote?: string;          // Short note for UI, e.g. "Requires Firebolt with ACS support"
 }
 ```
 

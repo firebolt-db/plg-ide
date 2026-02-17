@@ -15,11 +15,17 @@ Experience Firebolt's value through interactive, feature-by-feature demonstratio
 - **Build the web app (Loveable)** — Clone this repo and use it as context for [Loveable](https://loveable.dev) to build the plg-ide web application. Start with **[docs/LOVEABLE.md](docs/LOVEABLE.md)**; it defines the read order (PLAN_AND_GOVERNANCE, KNOWLEDGE, APP_SPEC, DATA_CONTRACTS, USER_FLOWS, app-manifest) and connectivity rules. The app will offer the same exploratory stepped experience as the IDE (connection → confirm target → vertical → feature → run SQL → show metrics and explain).
 - **Add a vertical or capability** — Follow **[docs/PLAN_AND_GOVERNANCE.md](docs/PLAN_AND_GOVERNANCE.md)** and the "Adding a New Vertical" / "Adding a New Feature" sections in [ROADMAP.md](ROADMAP.md). You **must** update **[docs/app-manifest.json](docs/app-manifest.json)** when adding verticals or features so the IDE and Loveable app both see the new content. See **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** for a consolidated checklist. Run `python3 scripts/validate_manifest_structure.py` to verify the repo structure matches the manifest.
 
+### Go straight to a feature (you already know what you need)
+
+- **In the IDE:** After connecting (Quick Start below), ask for the feature by name, e.g. *"I only want to see automated column statistics"* or *"Show me aggregating indexes"*. The AI will take you straight to that demo (and, if needed, a vertical that has it).
+- **In the web app:** Use a direct link to the feature’s demo page: `/demo/<vertical_id>/<feature_id>` (e.g. `/demo/gaming/automated_column_statistics`). If you’re not connected, the app runs setup then opens that page. You can also use `?feature=<feature_id>` on the home page to be redirected.
+- **Directory:** For a full list of features and their direct paths (IDE prompts and app URLs), see **[docs/FEATURE_DIRECTORY.md](docs/FEATURE_DIRECTORY.md)**. Some features require a specific Firebolt Core or Cloud version—see **[docs/FIREBOLT_VERSIONS.md](docs/FIREBOLT_VERSIONS.md)**.
+
 ## Quick Start
 
 ### 1. Add Firebolt MCP to Cursor (one click)
 
-**Firebolt Core (local, no account):** Use the button below. You’ll need [Docker](https://docs.docker.com/get-docker/) and [Firebolt Core](https://docs.firebolt.io/core/) running (e.g. `docker run -d -p 3473:3473 ghcr.io/firebolt-db/firebolt-core:latest`).
+**Firebolt Core (local, no account):** Use the button below. You’ll need [Docker](https://docs.docker.com/get-docker/) and [Firebolt Core](https://docs.firebolt.io/core/) running (e.g. `docker run -d -p 3473:3473 ghcr.io/firebolt-db/firebolt-core:latest`). Some demos require a recent Core image—see [docs/FIREBOLT_VERSIONS.md](docs/FIREBOLT_VERSIONS.md).
 
 [![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=Firebolt%20MCP%20%28Core%29&config=eyJjb21tYW5kIjoiZG9ja2VyIiwiYXJncyI6WyJydW4iLCItaSIsIi0tcm0iLCItLW5ldHdvcmsiLCJob3N0IiwiLWUiLCJGSVJFQk9MVF9NQ1BfQ09SRV9VUkwiLCItZSIsIkZJUkVCT0xUX01DUF9ESVNBQkxFX1JFU09VUkNFUz10cnVlIiwiZ2hjci5pby9maXJlYm9sdC1kYi9tY3Atc2VydmVyOjAuNi4wIl0sImVudiI6eyJGSVJFQk9MVF9NQ1BfQ09SRV9VUkwiOiJodHRwOi8vbG9jYWxob3N0OjM0NzMiLCJGSVJFQk9MVF9NQ1BfRElTQUJMRV9SRVNPVVJDRVMiOiJ0cnVlIn19)
 
@@ -65,6 +71,7 @@ Prove-the-value demonstrations:
 | Feature | What It Does | Typical Improvement |
 |---------|--------------|---------------------|
 | [Aggregating Indexes](features/aggregating_indexes/) | Pre-computed aggregations | 50-100X faster queries |
+| [Automated Column Statistics](features/automated_column_statistics/) | Better join ordering from column stats | Up to 3x+ (no query changes) |
 | Late Materialization | Coming Soon | Read less data |
 | Vector Search | Coming Soon | Semantic search, AI |
 

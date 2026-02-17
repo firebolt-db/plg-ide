@@ -216,6 +216,46 @@ This applies to: Setup Wizard (create/select database), Data Loading (load demo 
 
 ---
 
+## Flow 2b: Land on a specific feature (deep link)
+
+**Goal:** Let a user open a link that goes straight to one feature (e.g. Automated Column Statistics) and complete setup only if needed, without forcing Home → vertical → feature.
+
+**Persona:** User who received a shareable link (e.g. campaign or support) or who wants to try one capability first.
+
+**When:** User opens a URL of the form `/demo/:vertical/:feature` (e.g. `/demo/gaming/automated_column_statistics`) or lands on home with `?feature=automated_column_statistics` (and optionally `?vertical=gaming`).
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. User opens deep link                                 │
+│     └─ e.g. /demo/gaming/automated_column_statistics   │
+│     └─ or /?feature=automated_column_statistics        │
+│                                                         │
+│  2a. If NOT connected                                    │
+│     └─ Show Setup Wizard (connection + confirm target)│
+│     └─ After successful setup → redirect to            │
+│         /demo/<vertical>/<feature>                      │
+│     └─ Show that feature's Demo Runner page             │
+│                                                         │
+│  2b. If connected                                        │
+│     └─ Render Feature Demo Runner for that vertical     │
+│         and feature directly                             │
+│     └─ Show "Back to vertical" / "Back to home"        │
+│                                                         │
+│  3. User runs baseline/optimized and sees results         │
+│     └─ Same as Flow 2 from step 4 onward                │
+│                                                         │
+│  4. Invalid vertical/feature                             │
+│     └─ Show 404 or "Feature not available"             │
+│     └─ Offer link to home or vertical list              │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Success Criteria:** User can land on a single feature via URL, complete setup if needed, and run that demo without having to choose vertical or feature from the home grid.
+
+**Reference:** docs/APP_SPEC.md (§ Deep links).
+
+---
+
 ## Flow 3: Load Demo Data
 
 **Goal:** Populate tables with sample data for demos

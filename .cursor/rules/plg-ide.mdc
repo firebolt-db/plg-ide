@@ -162,7 +162,7 @@ After MCP is configured and connected, guide users through demos.
 
 1. **Read `docs/app-manifest.json`** to get the list of verticals (each with `id`, `name`, `description`, `features[]`).
 2. **Ask the user which vertical they want to explore** (e.g. Gaming, E-commerce, AdTech, Observability, Financial, CyberTech). Offer the list from the manifest; if they are unsure, suggest **Gaming** first.
-3. **For the chosen vertical, ask which feature** they want (from that vertical's `features` in the manifest). Only run demos for features with `status: "available"`. If they pick a feature with `status: "coming_soon"`, say the demo is not yet available and suggest an available feature (e.g. Aggregating Indexes).
+3. **For the chosen vertical, ask which feature** they want (from that vertical's `features` in the manifest). Only run demos for features with `status: "available"`. If they pick a feature with `status: "coming_soon"`, say the demo is not yet available and suggest an available feature (e.g. Aggregating Indexes). **If the user says they only want to see one specific feature** (e.g. "I only want to see automated column statistics"), skip asking for vertical first: use the manifest to find a vertical that has that feature with `status: "available"` (e.g. Gaming for `automated_column_statistics`) and go straight to that feature's setup and demo steps.
 4. **Resolve paths** using the vertical `id` and feature `id`: e.g. `verticals/gaming/...`, `verticals/ecommerce/features/partitioning/...`.
 
 ### Step 2: Set Up Demo Data
