@@ -27,6 +27,35 @@ This document tracks the verticals and features to be developed, mapped to Fireb
 
 ---
 
+## Deep control settings
+
+Firebolt exposes many controls for query planning, parallelism, data layout, schema, engine, and caching. See **[docs/DEEP_CONTROL.md](docs/DEEP_CONTROL.md)** for the full list with runtime labels (Core + Cloud vs Cloud only).
+
+**Runtime behavior:** When the user has selected **Firebolt Cloud**, they can run full demos for all deep control features in a vertical. When they have selected **Firebolt Core**, they can run demos for features available on Core; for **Cloud-only** features (engine lifecycle, cross-region), the app shows example SQL and a clear notice that the capability is available in Firebolt Cloud—Run is disabled. See docs/APP_SPEC.md (§ Runtime-specific features) and docs/USER_FLOWS.md (Flow 2c).
+
+| Control (from DEEP_CONTROL.md) | In repo | Runtime | Notes |
+|--------------------------------|--------|---------|------|
+| 1. Optimizer mode | New feature (planned) | Core + Cloud | optimizer_mode = user_guided |
+| 2. Join ordering hint | New feature (planned) | Core + Cloud | no_join_ordering |
+| 3. Automated Column Statistics | **Existing** (Gaming ✓) | Core + Cloud | features/automated_column_statistics |
+| 4. Thread limits (max_threads) | New feature (planned) | Core + Cloud | Parallelism controls |
+| 5. Insert thread limits | New feature (planned) | Core + Cloud | max_insert_threads |
+| 6. Tablet sizing | New feature (planned) | Core + Cloud | tablet_min/max_size_bytes |
+| 7. Partition limits | New feature (planned) | Core + Cloud | max_table_partitions_on_insert |
+| 8. Cross-region data access | New feature (planned) | **Cloud only** | COPY CROSS_REGION_REQUEST_MODE |
+| 9. Table type (FACT/DIMENSION) | Schema patterns in demos | Core + Cloud | CREATE FACT/DIMENSION TABLE |
+| 10. Partitioning strategy | **Existing** (E-commerce ✓) | Core + Cloud | verticals/ecommerce/features/partitioning |
+| 11. Primary index design | In schema demos | Core + Cloud | PRIMARY INDEX ... |
+| 12. Aggregating indexes | **Existing** (all verticals) | Core + Cloud | features/aggregating_indexes |
+| 13. Auto vacuum | New feature (planned) | **Cloud only** | ALTER ENGINE SET AUTO_VACUUM |
+| 14. Auto-scaling | New feature (planned) | **Cloud only** | MIN_CLUSTERS, MAX_CLUSTERS |
+| 15. Auto-stop | New feature (planned) | **Cloud only** | Idle timeout (Cloud UI) |
+| 16. Data warming | New feature (planned) | Core + Cloud | CHECKSUM(*) warm-up |
+
+New features (optimizer controls, parallelism, data warming, engine lifecycle, cross-region) will be added in phases; manifest entries will use `availableRuntimes` or `cloudOnly` where applicable.
+
+---
+
 ## Verticals
 
 ### ✅ Gaming (DONE)

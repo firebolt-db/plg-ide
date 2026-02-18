@@ -14,7 +14,11 @@ Some demos in this repo depend on **Firebolt features** that are only available 
 | **Aggregating Indexes** | Use `:latest` (or any recent image) | Generally available |
 | **Automated Column Statistics** | Use `:latest`; requires a build that supports [Automated Column Statistics](https://docs.firebolt.io/performance-and-observability/query-planning/automated-column-statistics) | Available in current Cloud; see [release notes](https://docs.firebolt.io/reference/release-notes) if on an older engine |
 | **Partitioning** | Use `:latest` | Generally available |
+| **Query Optimizer Controls, Parallelism, Data Warming** | Use `:latest` (Core + Cloud) | Generally available |
+| **Engine Lifecycle, Cross-Region Data Access** | **Cloud only** (examples shown on Core; run on Cloud) | Available on Firebolt Cloud |
 | **Late Materialization, Vector Search, Text Search, Time Travel, High Concurrency** | Not yet documented (coming_soon) | See release notes when demos are added |
+
+**Cloud-only features:** Some capabilities are available only on Firebolt Cloud (not on Core). In the app manifest these are marked with `cloudOnly: true` or `availableRuntimes: ["cloud"]`. When connected to Core, the app shows example SQL and a notice that the demo can be run on Cloud; Run is disabled. Examples: **Engine lifecycle** (auto-vacuum, auto-scaling, auto-stop), **Cross-region data access** (COPY WITH CROSS_REGION_REQUEST_MODE). See [docs/DEEP_CONTROL.md](DEEP_CONTROL.md) for the full list and runtime labels.
 
 **If a demo fails with an “unknown feature” or syntax error:** pull the latest Core image (`docker pull ghcr.io/firebolt-db/firebolt-core:latest`) and restart the container, or check that your Cloud engine is on a recent release.
 

@@ -19,7 +19,7 @@ Experience Firebolt's value through interactive, feature-by-feature demonstratio
 
 - **In the IDE:** After connecting (Quick Start below), ask for the feature by name, e.g. *"I only want to see automated column statistics"* or *"Show me aggregating indexes"*. The AI will take you straight to that demo (and, if needed, a vertical that has it).
 - **In the web app:** Use a direct link to the feature’s demo page: `/demo/<vertical_id>/<feature_id>` (e.g. `/demo/gaming/automated_column_statistics`). If you’re not connected, the app runs setup then opens that page. You can also use `?feature=<feature_id>` on the home page to be redirected.
-- **Directory:** For a full list of features and their direct paths (IDE prompts and app URLs), see **[docs/FEATURE_DIRECTORY.md](docs/FEATURE_DIRECTORY.md)**. Some features require a specific Firebolt Core or Cloud version—see **[docs/FIREBOLT_VERSIONS.md](docs/FIREBOLT_VERSIONS.md)**.
+- **Directory:** For a full list of features and their direct paths (IDE prompts and app URLs), see **[docs/FEATURE_DIRECTORY.md](docs/FEATURE_DIRECTORY.md)**. Some features require a specific Firebolt Core or Cloud version—see **[docs/FIREBOLT_VERSIONS.md](docs/FIREBOLT_VERSIONS.md)**. Some capabilities (Engine Lifecycle, Cross-Region) are **Cloud-only**: on Core you see example SQL and a notice; run the demo on Firebolt Cloud. See **[docs/DEEP_CONTROL.md](docs/DEEP_CONTROL.md)** for all deep control settings and runtime labels.
 
 ## Quick Start
 

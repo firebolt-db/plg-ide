@@ -94,6 +94,9 @@ interface FeatureRef {
   featureId: string;             // Links to Feature.id
   status: 'available' | 'coming_soon';
   customConfig?: Record<string, unknown>;
+  // Runtime: where this feature can be demoed. Omitted = both Core and Cloud.
+  availableRuntimes?: ('core' | 'cloud')[];
+  cloudOnly?: boolean;           // If true, implies availableRuntimes: ['cloud']
 }
 
 // Feature definition
@@ -108,6 +111,9 @@ interface Feature {
   // Firebolt version requirements (optional; see docs/FIREBOLT_VERSIONS.md)
   minCoreVersion?: string;       // e.g., 'latest' or a specific Docker image tag
   versionNote?: string;          // Short note for UI, e.g. "Requires Firebolt with ACS support"
+  // Runtime: where this feature can be demoed. Omitted = both Core and Cloud.
+  availableRuntimes?: ('core' | 'cloud')[];
+  cloudOnly?: boolean;          // If true, implies availableRuntimes: ['cloud']
 }
 ```
 

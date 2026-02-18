@@ -22,7 +22,9 @@
       "features": [
         { "id": "aggregating_indexes", "name": "Aggregating Indexes", "description": "Pre-compute aggregations for 50-100X faster queries", "status": "available" },
         { "id": "automated_column_statistics", "name": "Automated Column Statistics", "description": "Better join ordering from column stats (ndistinct) without query changes", "status": "available", "minCoreVersion": "latest", "versionNote": "Requires Firebolt with automated column statistics support." },
-        { "id": "late_materialization", "name": "Late Materialization", "description": "Reduce I/O with deferred joins", "status": "coming_soon" }
+        { "id": "late_materialization", "name": "Late Materialization", "description": "Reduce I/O with deferred joins", "status": "coming_soon" },
+        { "id": "query_optimizer_controls", "name": "Query Optimizer Controls", "description": "user_guided mode and no_join_ordering for predictable plans", "status": "available" },
+        { "id": "data_warming", "name": "Data Warming", "description": "Pre-load playstats into cache for lower latency", "status": "available" }
       ]
     },
     {
@@ -43,7 +45,8 @@
         { "id": "aggregating_indexes", "name": "Aggregating Indexes", "description": "Sales and revenue aggregations, 50-100X faster", "status": "available" },
         { "id": "partitioning", "name": "Partitioning", "description": "Partition pruning for date-range queries on orders and order_items", "status": "available" },
         { "id": "automated_column_statistics", "name": "Automated Column Statistics", "description": "Join ordering for orders/products by category or customer", "status": "coming_soon" },
-        { "id": "late_materialization", "name": "Late Materialization", "description": "Wide product tables, read only needed columns", "status": "coming_soon" }
+        { "id": "late_materialization", "name": "Late Materialization", "description": "Wide product tables, read only needed columns", "status": "coming_soon" },
+        { "id": "cross_region", "name": "Cross-Region Data Access", "description": "COPY from S3 in another region (Cloud only)", "status": "available", "cloudOnly": true }
       ]
     },
     {
@@ -63,7 +66,8 @@
       "features": [
         { "id": "aggregating_indexes", "name": "Aggregating Indexes", "description": "Campaign and publisher aggregations", "status": "available" },
         { "id": "automated_column_statistics", "name": "Automated Column Statistics", "description": "Join ordering for campaigns/impressions by dimension", "status": "coming_soon" },
-        { "id": "high_concurrency", "name": "High Concurrency", "description": "100+ QPS, workload isolation", "status": "coming_soon" }
+        { "id": "high_concurrency", "name": "High Concurrency", "description": "100+ QPS, workload isolation", "status": "coming_soon" },
+        { "id": "parallelism_controls", "name": "Parallelism & Resource Limits", "description": "max_threads, max_insert_threads for memory and concurrency", "status": "available" }
       ]
     },
     {
@@ -84,7 +88,8 @@
       "features": [
         { "id": "aggregating_indexes", "name": "Aggregating Indexes", "description": "Time-bucketed metrics by service/endpoint", "status": "available" },
         { "id": "automated_column_statistics", "name": "Automated Column Statistics", "description": "Join ordering for logs/metrics by service or endpoint", "status": "coming_soon" },
-        { "id": "text_search", "name": "Text Search", "description": "Full-text log search", "status": "coming_soon" }
+        { "id": "text_search", "name": "Text Search", "description": "Full-text log search", "status": "coming_soon" },
+        { "id": "engine_lifecycle", "name": "Engine Lifecycle", "description": "Auto-vacuum, auto-scaling, auto-stop (Cloud only)", "status": "available", "cloudOnly": true }
       ]
     },
     {
@@ -131,6 +136,11 @@
     { "id": "late_materialization", "name": "Late Materialization", "typicalImprovement": "60-90% less I/O", "shortDescription": "Read only columns needed, defer joins" },
     { "id": "vector_search", "name": "Vector Search", "typicalImprovement": "Semantic similarity", "shortDescription": "HNSW indexes for AI/ML use cases" },
     { "id": "high_concurrency", "name": "High Concurrency", "typicalImprovement": "100+ QPS", "shortDescription": "Workload isolation, multiple engines" },
-    { "id": "automated_column_statistics", "name": "Automated Column Statistics", "typicalImprovement": "Better join order, up to 3x+", "shortDescription": "Optimizer uses column stats for join ordering without query changes" }
+    { "id": "automated_column_statistics", "name": "Automated Column Statistics", "typicalImprovement": "Better join order, up to 3x+", "shortDescription": "Optimizer uses column stats for join ordering without query changes" },
+    { "id": "query_optimizer_controls", "name": "Query Optimizer Controls", "typicalImprovement": "Predictable plans", "shortDescription": "user_guided mode and no_join_ordering hint" },
+    { "id": "parallelism_controls", "name": "Parallelism & Resource Limits", "typicalImprovement": "Memory and concurrency control", "shortDescription": "max_threads, max_insert_threads" },
+    { "id": "data_warming", "name": "Data Warming", "typicalImprovement": "Lower latency after warm-up", "shortDescription": "Pre-load data into cache with CHECKSUM scan" },
+    { "id": "engine_lifecycle", "name": "Engine Lifecycle", "typicalImprovement": "Cost and resource tuning", "shortDescription": "Auto-vacuum, auto-scaling, auto-stop", "cloudOnly": true },
+    { "id": "cross_region", "name": "Cross-Region Data Access", "typicalImprovement": "Ingest from other regions", "shortDescription": "COPY CROSS_REGION_REQUEST_MODE", "cloudOnly": true }
   ]
 }

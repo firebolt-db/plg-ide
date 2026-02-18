@@ -236,6 +236,9 @@ The Feature Demo Runner must always show **both** Baseline and Optimized cards w
 **Further reading (alongside the demo):**  
 Display a **Further reading** block on this page (and on the Vertical Overview page) using links from `app-manifest.json` → `verticals[].furtherReading`. Each item is `{ "label": "...", "url": "..." }`. These are the engineering blogs and Firebolt docs for this vertical (source of truth: `verticals/{id}/README.md` section "Further reading (feature demos)" and main `README.md` "Further reading"). Show them as a short list of links so users can read more after the demo without leaving the app flow.
 
+**Runtime-specific features (Cloud-only demos):**  
+Some features are marked in the manifest as Cloud-only (`cloudOnly: true` or `availableRuntimes: ["cloud"]`). When the user is connected to **Firebolt Cloud**, show the normal demo flow (Baseline/Optimized, Run buttons) and allow execution. When the user is connected to **Firebolt Core**, for those features only: show the same SQL as **reference examples** (read-only or with Run disabled), display a clear notice (e.g. "This capability is available in Firebolt Cloud. The examples below are for reference; switch to Cloud to run this demo."), and optionally link to [Firebolt Cloud](https://www.firebolt.io/) or the docs. Do not allow Run for Cloud-only features when the current runtime is Core.
+
 ### 5. SQL Playground (`/playground`)
 
 **Purpose:** Interactive SQL editor

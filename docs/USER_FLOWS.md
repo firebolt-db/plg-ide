@@ -175,6 +175,10 @@ This applies to: Setup Wizard (create/select database), Data Loading (load demo 
 │     ├─ See the SQL query that will be tested           │
 │     └─ See two cards: Baseline | Optimized             │
 │                                                         │
+│  If feature is Cloud-only and runtime is Core:         │
+│     └─ Show example SQL (read-only), Cloud-only notice│
+│     └─ No Run; "Switch to Cloud to run this demo"      │
+│                                                         │
 │  5. Run Baseline (without feature)                      │
 │     ├─ Click "Run Baseline" button                     │
 │     ├─ See loading spinner                             │
@@ -253,6 +257,41 @@ This applies to: Setup Wizard (create/select database), Data Loading (load demo 
 **Success Criteria:** User can land on a single feature via URL, complete setup if needed, and run that demo without having to choose vertical or feature from the home grid.
 
 **Reference:** docs/APP_SPEC.md (§ Deep links).
+
+---
+
+## Flow 2c: User on Core opens a Cloud-only feature demo
+
+**Goal:** When the user is connected to Firebolt Core and opens a feature that is available only on Firebolt Cloud, show the SQL as reference and a clear message that the demo can be run on Cloud—do not offer Run.
+
+**Persona:** User on Core (local) who navigates to or deep-links to a Cloud-only feature (e.g. Engine lifecycle, Cross-region data access).
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  1. User is connected to Firebolt Core                  │
+│     └─ Runtime = Core (e.g. localhost:3473)             │
+│                                                         │
+│  2. User opens a Cloud-only feature demo                │
+│     └─ e.g. Engine lifecycle or Cross-region access    │
+│     └─ Feature has cloudOnly: true or                   │
+│         availableRuntimes: ["cloud"] in manifest       │
+│                                                         │
+│  3. App shows Feature Demo Runner for that feature      │
+│     ├─ Display example SQL (baseline/optimized) as      │
+│     │   read-only reference                             │
+│     ├─ Do not enable Run Baseline / Run Optimized      │
+│     └─ Show notice: "This capability is available in   │
+│         Firebolt Cloud. The examples below are for     │
+│         reference; switch to Cloud to run this demo."   │
+│                                                         │
+│  4. Optional: Link to Firebolt Cloud or docs            │
+│     └─ User can switch runtime and return to run demo  │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Success Criteria:** Core users see Cloud-only demos as examples with a clear Cloud-only message and no run; they are not left with a broken or confusing Run experience.
+
+**Reference:** docs/APP_SPEC.md (§ Runtime-specific features), docs/DATA_CONTRACTS.md (availableRuntimes, cloudOnly).
 
 ---
 

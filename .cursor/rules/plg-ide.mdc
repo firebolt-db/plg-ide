@@ -145,7 +145,7 @@ plg-ide/
 
 ## Vertical and Feature List (Single Source of Truth)
 
-**The list of verticals and their features comes from `docs/app-manifest.json`.** Read that file to discover available verticals and, for each vertical, the list of features (with `status`: `available` or `coming_soon`). Resolve all paths using the vertical and feature **ids** from the manifest:
+**The list of verticals and their features comes from `docs/app-manifest.json`.** Read that file to discover available verticals and, for each vertical, the list of features (with `status`: `available` or `coming_soon`). Features may include `cloudOnly: true` or `availableRuntimes: ["cloud"]`—when the user is on **Firebolt Core**, do not run those demos; show SQL as reference and a "Cloud only" notice (see Step 3 below). Resolve all paths using the vertical and feature **ids** from the manifest:
 
 - Vertical schema: `verticals/{vertical_id}/schema/01_tables.sql`
 - Vertical data load: `verticals/{vertical_id}/data/load.sql` (Cloud/S3) or `verticals/{vertical_id}/data/sample_data.py` (Core)
@@ -181,6 +181,14 @@ Using MCP tools, help them set up the chosen vertical's demo:
    - For **Core**: Use `verticals/{vertical_id}/data/sample_data.py` if present, or smaller INSERT statements
 
 ### Step 3: Run the Feature Demo
+
+**Runtime check (Cloud-only features):** Before running any demo, check the feature in `docs/app-manifest.json` for `cloudOnly: true` or `availableRuntimes: ["cloud"]`. If the user is connected to **Firebolt Core** and the feature is Cloud-only (e.g. `engine_lifecycle`, `cross_region`):
+
+- **Do not execute** the demo SQL via `firebolt_query`.
+- **Show the SQL** from `01_baseline.sql`, `02_*.sql`, and `03_optimized.sql` as **reference examples** (read-only).
+- **Display this notice:** "This capability is available in Firebolt Cloud. The examples above are for reference; switch to Cloud to run this demo." Optionally link to [Firebolt Cloud](https://www.firebolt.io/) or docs/DEEP_CONTROL.md.
+
+If the user is on **Firebolt Cloud** or the feature is not Cloud-only, proceed with the steps below.
 
 For the chosen vertical and feature (e.g. aggregating_indexes, partitioning):
 
