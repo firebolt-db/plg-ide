@@ -161,13 +161,17 @@ After MCP is configured and connected, guide users through demos.
 ### Step 1: Choose Vertical (and Feature)
 
 1. **Read `docs/app-manifest.json`** to get the list of verticals (each with `id`, `name`, `description`, `features[]`).
-2. **Ask the user which vertical they want to explore** (e.g. Gaming, E-commerce, AdTech, Observability, Financial, CyberTech). Offer the list from the manifest; if they are unsure, suggest **Gaming** first.
+2. **Ask the user which vertical they want to explore** (e.g. Gaming, E-commerce, AdTech, Observability, Financial, Iceberg Read Experience, CyberTech). Offer the list from the manifest; if they are unsure, suggest **Gaming** first.
 3. **For the chosen vertical, ask which feature** they want (from that vertical's `features` in the manifest). Only run demos for features with `status: "available"`. If they pick a feature with `status: "coming_soon"`, say the demo is not yet available and suggest an available feature (e.g. Aggregating Indexes). **If the user says they only want to see one specific feature** (e.g. "I only want to see automated column statistics"), skip asking for vertical first: use the manifest to find a vertical that has that feature with `status: "available"` (e.g. Gaming for `automated_column_statistics`) and go straight to that feature's setup and demo steps.
-4. **Resolve paths** using the vertical `id` and feature `id`: e.g. `verticals/gaming/...`, `verticals/ecommerce/features/partitioning/...`.
+4. **Resolve paths** using the vertical `id` and feature `id`: e.g. `verticals/gaming/...`, `verticals/ecommerce/features/partitioning/...`. **Exception:** For vertical `iceberg_demo` (Cloud only), demo content lives under `features/iceberg/` (no `verticals/iceberg_demo/schema`); use `features/iceberg/01_create_locations_tpch.sql`, `02_create_view.sql`, and the feature README there.
 
 ### Step 2: Set Up Demo Data
 
 Using MCP tools, help them set up the chosen vertical's demo:
+
+**Exception (vertical `iceberg_demo`):** There is no `verticals/iceberg_demo/` folder; the demo lives under `features/iceberg/`. (1) Create database `iceberg_demo` (connect with an existing DB first if needed). (2) Run `features/iceberg/01_create_locations_tpch.sql` then `features/iceberg/02_create_view.sql`. No schema/01_tables or data load—data is read from S3 via READ_ICEBERG. Then proceed to Step 3.
+
+For all other verticals:
 
 1. **Create database** (if needed):
    ```sql
@@ -191,6 +195,10 @@ Using MCP tools, help them set up the chosen vertical's demo:
 If the user is on **Firebolt Cloud** or the feature is not Cloud-only, proceed with the steps below.
 
 For the chosen vertical and feature (e.g. aggregating_indexes, partitioning):
+
+**Exception (vertical `iceberg_demo`, feature `iceberg`):** Demo content is in `features/iceberg/`. After Step 2 (locations + views), run sample queries from `features/iceberg/README.md` or `features/iceberg/tpch_queries.sql` (e.g. `SELECT COUNT(*) FROM iceberg_lineitem`, or a partition-pruning query). There is no 01_baseline / 03_optimized pair; explain partition pruning, column pruning, and metadata caching from the README.
+
+For all other verticals/features:
 
 1. **Run baseline** (without the feature): Read `verticals/{vertical_id}/features/{feature_id}/01_baseline.sql`, execute via `firebolt_query`, note execution time.
 2. **Create or enable the feature**: If the feature has a `02_create_indexes.sql` or `02_*.sql`, read and execute it via `firebolt_query`; explain what is being created.

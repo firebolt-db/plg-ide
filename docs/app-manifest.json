@@ -112,6 +112,18 @@
       ]
     },
     {
+      "id": "iceberg_demo",
+      "name": "Iceberg Read Experience",
+      "description": "Query Apache Iceberg tables in S3 with sub-second performance",
+      "dataset": "TPCH Lineitem",
+      "database": "iceberg_demo",
+      "tables": ["iceberg_lineitem"],
+      "rowCount": "TPCH scale factor data",
+      "features": [
+        { "id": "iceberg", "name": "Iceberg Read", "description": "Sub-second queries on Iceberg tables with partition pruning and metadata optimization", "status": "available", "cloudOnly": true }
+      ]
+    },
+    {
       "id": "cybertech",
       "name": "CyberTech",
       "description": "Security analytics, threat detection, multi-cloud anomaly detection",
@@ -141,6 +153,7 @@
     { "id": "parallelism_controls", "name": "Parallelism & Resource Limits", "typicalImprovement": "Memory and concurrency control", "shortDescription": "max_threads, max_insert_threads" },
     { "id": "data_warming", "name": "Data Warming", "typicalImprovement": "Lower latency after warm-up", "shortDescription": "Pre-load data into cache with CHECKSUM scan" },
     { "id": "engine_lifecycle", "name": "Engine Lifecycle", "typicalImprovement": "Cost and resource tuning", "shortDescription": "Auto-vacuum, auto-scaling, auto-stop", "cloudOnly": true },
-    { "id": "cross_region", "name": "Cross-Region Data Access", "typicalImprovement": "Ingest from other regions", "shortDescription": "COPY CROSS_REGION_REQUEST_MODE", "cloudOnly": true }
+    { "id": "cross_region", "name": "Cross-Region Data Access", "typicalImprovement": "Ingest from other regions", "shortDescription": "COPY CROSS_REGION_REQUEST_MODE", "cloudOnly": true },
+    { "id": "iceberg", "name": "Iceberg Read", "typicalImprovement": "Sub-second queries on TB-scale datasets", "shortDescription": "Native Iceberg support with partition pruning and metadata optimization", "cloudOnly": true }
   ]
 }

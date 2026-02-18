@@ -153,6 +153,26 @@ New features (optimizer controls, parallelism, data warming, engine lifecycle, c
 
 ---
 
+### ✅ Iceberg Read Experience (DONE)
+
+**What**: Native support for querying Apache Iceberg tables in S3  
+**Value**: Sub-second queries on terabyte-scale Iceberg datasets  
+**Demo**: [Iceberg Read Experience](features/iceberg/) – Partition pruning, metadata optimization; vertical entry in app-manifest as `iceberg_demo`.
+
+**Key optimizations demonstrated:**
+- Partition pruning: Filter on partition columns to skip entire partitions (10-100X faster)
+- Column pruning: Select only needed columns (30-70% less I/O)
+- Metadata caching: Leverage cached Iceberg metadata (20-50% faster on repeated queries)
+- Predicate pushdown: Push filters to Iceberg layer for early filtering
+
+**Requirements**: Firebolt Cloud (S3-based Iceberg tables), AWS credentials (optional for public demo bucket)
+
+**References:**
+- [Querying Apache Iceberg with Sub-Second Performance](https://www.firebolt.io/blog/querying-apache-iceberg-with-sub-second-performance)
+- [Unlocking Faster Iceberg Queries: Writer Optimizations](https://www.firebolt.io/blog/unlocking-faster-iceberg-queries-the-writer-optimizations-you-are-missing)
+
+---
+
 ### 🔲 Healthcare / Life Sciences
 
 **Dataset**: Custom (based on IQVIA pattern)  
@@ -178,6 +198,16 @@ New features (optimizer controls, parallelism, data warming, engine lifecycle, c
 **Demo**: Gaming vertical - leaderboards, DAU, player profiles
 
 **Applicable to all verticals** - this is the flagship feature.
+
+---
+
+### ✅ Iceberg Read Experience (DONE)
+
+**What**: Native support for querying Apache Iceberg tables in S3  
+**Value**: Sub-second queries on terabyte-scale Iceberg datasets  
+**Demo**: [features/iceberg/](features/iceberg/) – CREATE LOCATION, views from READ_ICEBERG, TPC-H queries on public S3 bucket.
+
+**Requirements**: Firebolt Cloud (S3-based Iceberg tables). Cloud-only.
 
 ---
 
@@ -516,6 +546,7 @@ For each comparison demo:
 - [x] AdTech vertical (schema, data, aggregating indexes demo)
 - [x] Observability vertical (schema, data, aggregating indexes demo)
 - [x] Financial vertical (schema, data, aggregating indexes demo)
+- [x] Iceberg read experience (Cloud-only, S3-based Iceberg tables; demo in features/iceberg/)
 - [ ] Late materialization demos
 
 ### Phase 3: Advanced Features (blog-driven order)
@@ -523,7 +554,7 @@ For each comparison demo:
 - [ ] Event Streams demo (AdTech: click-fraud pattern, array agg index)
 - [ ] High concurrency demos (AdTech)
 - [ ] Streaming ingestion demos (Gaming, Observability; Confluent connector)
-- [ ] Iceberg / Data Lake vertical (optional; firebolt-iceberg-demo)
+- [x] Iceberg read experience (features/iceberg/; Cloud only)
 
 ### Phase 4: Competitive Benchmarks (Loveable App)
 - [ ] SQL Playground with side-by-side ClickHouse comparison
