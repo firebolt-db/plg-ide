@@ -8,8 +8,8 @@ Demo sequence: create LOCATIONs for TPCH tables, then views from those LOCATIONs
 
 Connect using an existing database so we can create `iceberg_demo`:
 
-- **Prompt:** "Connect to Firebolt Cloud with engine **bench2cost_l_co_3n** and database **clickbench**."
-- Or use `firebolt_connect` with engine `bench2cost_l_co_3n` and database `clickbench`.
+- **Prompt:** "Connect to Firebolt Cloud with engine **your_engine_name** and database **your_existing_db**."
+- Or use `firebolt_connect` with your engine name and an existing database name (e.g. your default DB).
 
 ## 2. Create the demo database
 

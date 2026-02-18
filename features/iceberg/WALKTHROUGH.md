@@ -8,11 +8,17 @@ This guide walks through setting up and querying your Iceberg data lake with Fir
 
 - **Firebolt Cloud** account (Iceberg requires Cloud, not Core).
 - **Engine** attached to the database you use (can be stopped; Firebolt will start it on first query — allow a few minutes).
-- **Credentials** in environment or in `../bench-2-cost/firebolt/envvars.sh`:
-  - `FIREBOLT_USER` or `FIREBOLT_EMAIL`
-  - `FIREBOLT_PASSWORD`
-  - `FIREBOLT_ACCOUNT` (optional)
-  - `FIREBOLT_ENGINE` (e.g. `bench2cost_l_co_3n`)
+- **Credentials** in the environment. Set these before running any step (or use a `.env` file; see [config/cloud.env.template](../../config/cloud.env.template) in the repo root):
+
+  | Variable | Description |
+  |----------|-------------|
+  | `FIREBOLT_CLIENT_ID` | Firebolt Cloud service account client ID |
+  | `FIREBOLT_CLIENT_SECRET` | Firebolt Cloud service account client secret |
+  | `FIREBOLT_ENGINE` | Your Firebolt engine name |
+  | `FIREBOLT_ACCOUNT` | (Optional) Account name if not default |
+  | `FIREBOLT_DATABASE` | Set per step below; use an existing DB for Step 1, then `iceberg_demo` |
+
+  Copy `config/cloud.env.template` to `.env`, fill in your values, and load with `set -a; source .env; set +a` (or export variables manually). Do not commit `.env`.
 
 All commands below are from the **repository root** unless noted.
 
@@ -20,15 +26,12 @@ All commands below are from the **repository root** unless noted.
 
 ## Step 1 — Create the database (one-time)
 
-The demo uses database `iceberg_demo`. Creation requires connecting with an existing database (e.g. `clickbench`), then creating `iceberg_demo`.
+The demo uses database `iceberg_demo`. Creation requires connecting with an existing database (e.g. your default DB), then creating `iceberg_demo`.
 
 ```bash
-# Optional: load credentials
-source ../bench-2-cost/firebolt/envvars.sh   # if you use it
-export FIREBOLT_ENGINE="${FIREBOLT_ENGINE:-bench2cost_l_co_3n}"
-
-# Create iceberg_demo (connects via clickbench, then creates DB)
-export FIREBOLT_DATABASE="clickbench"
+# Ensure FIREBOLT_CLIENT_ID, FIREBOLT_CLIENT_SECRET, FIREBOLT_ENGINE are set (see Prerequisites).
+# Use an existing database for the connection; replace your_existing_db with a DB that already exists.
+export FIREBOLT_DATABASE="your_existing_db"
 python3 -c "
 import sys
 sys.path.insert(0, '.')
@@ -40,7 +43,7 @@ r.close()
 "
 ```
 
-**What happens:** Firebolt connects to `clickbench`; if the engine was stopped, it may start here (wait a few minutes). Then it runs `CREATE DATABASE IF NOT EXISTS iceberg_demo`.
+**What happens:** Firebolt connects to your existing database; if the engine was stopped, it may start here (wait a few minutes). Then it runs `CREATE DATABASE IF NOT EXISTS iceberg_demo`.
 
 ---
 
@@ -100,15 +103,19 @@ Or run the file in your SQL client (Firebolt UI or IDE) after selecting `iceberg
 
 ## One-command run (steps 1–3)
 
-From repo root:
+From repo root, set credentials and an existing database (or load from `.env`), then:
 
 ```bash
-source ../bench-2-cost/firebolt/envvars.sh   # optional
-export FIREBOLT_ENGINE="${FIREBOLT_ENGINE:-bench2cost_l_co_3n}"
+export FIREBOLT_CLIENT_ID="your_client_id"
+export FIREBOLT_CLIENT_SECRET="your_client_secret"
+export FIREBOLT_ENGINE="your_engine_name"
+export FIREBOLT_DATABASE="your_existing_db"   # any DB that already exists
+# Optional: export FIREBOLT_ACCOUNT="your_account"
+
 bash features/iceberg/run_demo.sh
 ```
 
-This does: create DB (via clickbench) → create LOCATIONs → create views. Run `tpch_queries.sql` manually if you want to execute Q1–Q22.
+Set `FIREBOLT_DATABASE` to an existing database so the script can connect and create `iceberg_demo`. This does: create `iceberg_demo` → create LOCATIONs → create views. Run `tpch_queries.sql` manually if you want to execute Q1–Q22.
 
 ---
 

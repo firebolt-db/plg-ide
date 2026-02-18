@@ -18,13 +18,29 @@ This is a public S3 bucket; AWS credentials are not required for the demo.
 
 ## Quick Start
 
-**Prerequisites:** Firebolt Cloud account, engine (can be stopped; allow a few minutes for start), credentials in env or `../bench-2-cost/firebolt/envvars.sh`.
+**Prerequisites:** Firebolt Cloud account, an engine (can be stopped; allow a few minutes for start), and credentials in the environment.
+
+**Required environment variables** (see [config/cloud.env.template](../../config/cloud.env.template) in the repo root):
+
+| Variable | Description |
+|----------|-------------|
+| `FIREBOLT_CLIENT_ID` | Firebolt Cloud service account client ID |
+| `FIREBOLT_CLIENT_SECRET` | Firebolt Cloud service account client secret |
+| `FIREBOLT_ENGINE` | Your Firebolt engine name (e.g. `my_engine`) |
+| `FIREBOLT_ACCOUNT` | (Optional) Account name; required if not default |
+| `FIREBOLT_DATABASE` | Set by the script; use `iceberg_demo` after setup |
+
+Copy `config/cloud.env.template` to `.env` in the repo root, fill in your values, then either export them in your shell or run the script after loading `.env` (e.g. `set -a; source .env; set +a; bash features/iceberg/run_demo.sh`). Do not commit `.env`.
 
 ### One-command demo (from repo root)
 
 ```bash
-source ../bench-2-cost/firebolt/envvars.sh   # optional
-export FIREBOLT_ENGINE="${FIREBOLT_ENGINE:-bench2cost_l_co_3n}"
+# Set credentials and an existing database (script will create iceberg_demo from it)
+export FIREBOLT_CLIENT_ID="your_client_id"
+export FIREBOLT_CLIENT_SECRET="your_client_secret"
+export FIREBOLT_ENGINE="your_engine_name"
+export FIREBOLT_DATABASE="your_existing_db"   # any DB that already exists
+
 bash features/iceberg/run_demo.sh
 ```
 
@@ -32,10 +48,11 @@ This script: (1) creates `iceberg_demo` if missing, (2) creates LOCATIONs for al
 
 ### Step-by-step
 
+Ensure `FIREBOLT_CLIENT_ID`, `FIREBOLT_CLIENT_SECRET`, and `FIREBOLT_ENGINE` (and optionally `FIREBOLT_ACCOUNT`) are set. From repo root:
+
 ```bash
-# From repo root
-# 1. Create DB (connect with clickbench first)
-FIREBOLT_DATABASE=clickbench python3 -c "
+# 1. Create DB (connect with an existing database first, e.g. your default DB)
+FIREBOLT_DATABASE=your_existing_db python3 -c "
 from lib.firebolt import FireboltRunner
 r = FireboltRunner()
 r.execute('CREATE DATABASE IF NOT EXISTS iceberg_demo')
