@@ -14,6 +14,7 @@ Experience Firebolt's value through interactive, feature-by-feature demonstratio
 - **Use in your IDE** — Follow the Quick Start below, open this repo in Cursor (or another MCP-capable IDE), and ask **"Help me get started with Firebolt"**. You’ll be guided through runtime setup, then to pick a vertical and feature and run demos with real SQL and metrics.
 - **Build the web app (Loveable)** — Clone this repo and use it as context for [Loveable](https://loveable.dev) to build the plg-ide web application. Start with **[docs/LOVEABLE.md](docs/LOVEABLE.md)**; it defines the read order (PLAN_AND_GOVERNANCE, KNOWLEDGE, APP_SPEC, DATA_CONTRACTS, USER_FLOWS, app-manifest) and connectivity rules. The app will offer the same exploratory stepped experience as the IDE (connection → confirm target → vertical → feature → run SQL → show metrics and explain).
 - **Add a vertical or capability** — Follow **[docs/PLAN_AND_GOVERNANCE.md](docs/PLAN_AND_GOVERNANCE.md)** and the "Adding a New Vertical" / "Adding a New Feature" sections in [ROADMAP.md](ROADMAP.md). You **must** update **[docs/app-manifest.json](docs/app-manifest.json)** when adding verticals or features so the IDE and Loveable app both see the new content. See **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** for a consolidated checklist. Run `python3 scripts/validate_manifest_structure.py` to verify the repo structure matches the manifest.
+- **Deep control** — See **[docs/DEEP_CONTROL.md](docs/DEEP_CONTROL.md)** for all engine, query, and caching controls and which run on Core vs Cloud (including Cloud-only features like Engine Lifecycle and Cross-Region).
 
 ### Go straight to a feature (you already know what you need)
 
@@ -157,6 +158,7 @@ See [ROADMAP.md](ROADMAP.md) for planned verticals and features:
 | ✅ AdTech | 🔲 Vector Search |
 | ✅ Observability | 🔲 High Concurrency |
 | ✅ Financial | 🔲 Streaming Ingestion |
+| — | ✅ [Deep control](docs/DEEP_CONTROL.md) (Core + Cloud labels) |
 
 ## Further reading (after the demo)
 
