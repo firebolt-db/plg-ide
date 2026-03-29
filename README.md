@@ -47,6 +47,7 @@ You’ll be guided to pick a runtime (Core or Cloud), then run demos. Example pr
 - "Create the gaming demo tables"
 - "Show me how aggregating indexes improve query performance"
 - "Run a leaderboard query and explain the results"
+- "Set up the Iceberg read experience demo" (Cloud only)
 
 The AI uses the [Firebolt MCP Server](https://github.com/firebolt-db/mcp-server) to run queries and search docs in real time.
 
@@ -63,6 +64,7 @@ Industry-specific demos with real datasets:
 | [AdTech](verticals/adtech/) | AdTech | Custom | High QPS, campaign analytics, real-time bidding |
 | [Observability](verticals/observability/) | Observability | Custom | Log analytics, metrics aggregation, distributed tracing |
 | [Financial](verticals/financial/) | Financial Services | Custom | Transaction analytics, risk scoring, regulatory reporting |
+| [Iceberg Read Experience](features/iceberg/) | TPCH Lineitem | Public S3 | Sub-second queries on Apache Iceberg tables in S3 (Cloud only) |
 | [CyberTech](verticals/cybertech/) | Multi-Cloud Audit Logs | ~300K events | Security analytics, threat detection, multi-cloud anomaly detection |
 
 ### Features
@@ -72,6 +74,7 @@ Prove-the-value demonstrations:
 | Feature | What It Does | Typical Improvement |
 |---------|--------------|---------------------|
 | [Aggregating Indexes](features/aggregating_indexes/) | Pre-computed aggregations | 50-100X faster queries |
+| [Iceberg Read](features/iceberg/) | Query Iceberg tables in S3 | Sub-second queries on TB-scale datasets |
 | [Automated Column Statistics](features/automated_column_statistics/) | Better join ordering from column stats | Up to 3x+ (no query changes) |
 | Late Materialization | Coming Soon | Read less data |
 | Vector Search | Coming Soon | Semantic search, AI |
@@ -137,7 +140,7 @@ plg-ide/
 │   ├── observability/           # Logs, metrics, tracing
 │   ├── financial/               # Transactions, risk, reporting
 │   └── cybertech/               # Security, threat detection (placeholder)
-├── features/                    # Cross-vertical feature docs
+├── features/                    # Cross-vertical feature docs (incl. iceberg/)
 ├── docs/                        # App spec, Loveable entry, app-manifest.json
 └── .cursor/rules/               # IDE integration rules
 ```
@@ -158,6 +161,7 @@ See [ROADMAP.md](ROADMAP.md) for planned verticals and features:
 | ✅ AdTech | 🔲 Vector Search |
 | ✅ Observability | 🔲 High Concurrency |
 | ✅ Financial | 🔲 Streaming Ingestion |
+| ✅ Iceberg Read Experience (Cloud) | ✅ Iceberg Read |
 | — | ✅ [Deep control](docs/DEEP_CONTROL.md) (Core + Cloud labels) |
 
 ## Further reading (after the demo)
@@ -169,6 +173,7 @@ Engineering blogs and Firebolt docs that back the demos — use these when prese
 - **Vector Search**: [Vector Search Indexes Technical Deep Dive](https://www.firebolt.io/blog/technical-deep-dive-efficient-and-acid-compliant-vector-search-indexes-in-firebolt), [Building RAG Chatbot with Firebolt](https://www.firebolt.io/blog/building-a-chatbot-with-firebolt-using-retrieval-augmented-generation), [Firebolt docs: Vector indexes](https://docs.firebolt.io/sql-reference/vector-indexes)
 - **Streaming**: [Firebolt Connector for Confluent](https://www.firebolt.io/blog/firebolt-connector-for-confluent---real-time-applications-powered-by-streaming-data)
 - **Event Streams (AdTech)**: [Event Streams in Firebolt](https://www.firebolt.io/blog/event-streams-in-firebolt)
+- **Iceberg**: [Querying Apache Iceberg with Sub-Second Performance](https://www.firebolt.io/blog/querying-apache-iceberg-with-sub-second-performance), [Unlocking Faster Iceberg Queries](https://www.firebolt.io/blog/unlocking-faster-iceberg-queries-the-writer-optimizations-you-are-missing)
 - **Full list**: [ROADMAP.md – References / Firebolt Engineering Blogs](ROADMAP.md#firebolt-engineering-blogs-feature-demo-sources)
 
 ## License

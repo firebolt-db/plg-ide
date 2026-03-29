@@ -14,7 +14,7 @@ Open this repo in Cursor, connect Firebolt (Quick Start in [README](../README.md
 - *"Show me aggregating indexes"* → You’ll be asked which vertical (or say e.g. *"Gaming"*)
 - *"I want to try partitioning"* → E-commerce Partitioning demo
 
-**Feature names the IDE recognizes** (from the manifest): Aggregating Indexes, Automated Column Statistics, Partitioning, Query Optimizer Controls, Parallelism & Resource Limits, Data Warming, Engine Lifecycle, Cross-Region Data Access, Late Materialization, Vector Search, High Concurrency, Text Search, Time Travel. For features with demos in only one vertical, you don’t need to name the vertical. **Cloud-only features** (Engine Lifecycle, Cross-Region): when you’re on Core, the IDE shows example SQL and a notice that the demo runs on Cloud only.
+**Feature names the IDE recognizes** (from the manifest): Aggregating Indexes, Automated Column Statistics, Partitioning, Query Optimizer Controls, Parallelism & Resource Limits, Data Warming, Engine Lifecycle, Cross-Region Data Access, Iceberg Read, Late Materialization, Vector Search, High Concurrency, Text Search, Time Travel. For features with demos in only one vertical, you don’t need to name the vertical. **Cloud-only features** (Engine Lifecycle, Cross-Region, Iceberg Read): when you’re on Core, the IDE shows example SQL and a notice that the demo runs on Cloud only.
 
 ---
 
@@ -31,10 +31,11 @@ Use a **direct URL** so you land on that feature’s demo page. If you’re not 
 | Aggregating Indexes | `/demo/gaming/aggregating_indexes` |
 | Automated Column Statistics | `/demo/gaming/automated_column_statistics` |
 | Partitioning | `/demo/ecommerce/partitioning` |
+| Iceberg Read (Cloud only) | `/demo/iceberg_demo/iceberg` |
 
 **Optional:** Open the app with `?feature=<feature_id>` (and optionally `?vertical=<vertical_id>`). The app will redirect to `/demo/<vertical>/<feature>`; if you omit vertical, it picks the first vertical that has that feature.
 
-**Feature IDs** (for URLs and query params): `aggregating_indexes`, `automated_column_statistics`, `partitioning`, `query_optimizer_controls`, `parallelism_controls`, `data_warming`, `engine_lifecycle`, `cross_region`, `late_materialization`, `vector_search`, `high_concurrency`, `text_search`, `time_travel`.
+**Feature IDs** (for URLs and query params): `aggregating_indexes`, `automated_column_statistics`, `partitioning`, `query_optimizer_controls`, `parallelism_controls`, `data_warming`, `engine_lifecycle`, `cross_region`, `iceberg`, `late_materialization`, `vector_search`, `high_concurrency`, `text_search`, `time_travel`.
 
 ---
 
@@ -50,6 +51,7 @@ Use a **direct URL** so you land on that feature’s demo page. If you’re not 
 | Data Warming | Gaming | "Show me data warming" | `/demo/gaming/data_warming` |
 | Engine Lifecycle (Cloud only) | Observability | "Show me engine lifecycle" | `/demo/observability/engine_lifecycle` |
 | Cross-Region Data Access (Cloud only) | E-commerce | "Show me cross-region" | `/demo/ecommerce/cross_region` |
+| Iceberg Read (Cloud only) | Iceberg Read Experience | "Set up the Iceberg read experience demo" | `/demo/iceberg_demo/iceberg` |
 | Late Materialization | (coming_soon) | — | — |
 | Vector Search, High Concurrency, Text Search, Time Travel | (coming_soon in one or more verticals) | — | — |
 
